@@ -1,0 +1,126 @@
+DataPact: '0.1'
+id: dgfip.lac.COULEUR_IR.IR_2024
+identification:
+  nom_couloir: COULEUR_IR
+  type_couloir: Ingestion
+  jeu_donnees: IR_2024
+  version: 1.0.0
+  environnement: Prod
+parties:
+  administration_du_lac:
+    equipe: Equipe admin lac
+    contact: balf-admin-lac@dgfip.finances.gouv.fr
+  administrateur_gouvernance:
+    equipe: Gouvernance donnees
+    contact: dtnum.donnees.gouvernance@dgfip.finances.gouv.fr
+  responsables:
+    responsable_couloir:
+      nom: Resp Couloir
+      email: resp.couloir@dgfip.finances.gouv.fr
+      telephone: 01 00 00 00 00
+      tchap: '@resp.couloir'
+    responsable_donnees:
+      nom: Resp Donnees
+      email: resp.donnees@dgfip.finances.gouv.fr
+      telephone: 01 00 00 00 01
+      tchap: '@resp.donnees'
+    responsable_traitement:
+      nom: Resp Traitement
+      coordonnees: 'DGFiP - ... '
+      telephone: 01 00 00 00 02
+      tchap: '@resp.traitement'
+duree_du_datapact:
+  duree_contrat: 3 ans
+  date_effet: '2026-01-01'
+  date_fin: '2028-12-31'
+donnees:
+  - id: jeu de donnees 1
+    nom: Donnees 01
+    description: Ingestion IR 2024
+    finalite_associee: Gestion de l'impot
+    gouvernance:
+      localisation:
+        zone_du_couloir: argent
+        chemin_dossier: /lac/ir/argent/2024/
+        fichiers:
+          identifiant_fichier: F-IR-2024
+          nom_fichier_declare: ir_2024.parquet
+          format: parquet
+          processus_ingestion:
+            nom: ingestion_ir
+            description: Chargement mensuel
+            dates_ingestion:
+              date_premiere_ingestion: '2026-01-02'
+              date_derniere_ingestion: '2026-01-15T06:00:00Z'
+            frequence_mise_a_jour: mensuelle
+      connaissance:
+        chemin_carto: https://intranet/carto/ir
+        catalogue_donnees: https://intranet/catalogue/ir_2024
+        liste_metadonnees:
+          - annee
+          - montant_ir
+          - nir
+      qualite:
+        indicateurs:
+          - nom_indicateur: taux_completude
+            description: Taux de complétude
+            type_indicateur: taux
+            granularite: mois
+            script_calcul:
+              nom: calc_completude.py
+              version: 1.2.0
+            valeur_cible_alerte: '0.99'
+            objectif: '>=0.99'
+            dernier_calcul:
+              date: '2026-01-15'
+              resultat: '0.995'
+        frequence_calcul: mensuelle
+      conformite:
+        finalite_principale: Gestion de l'impot
+        fondement_juridique: CGI
+        identifiant_dcpod: DCPOD-IR-2024
+        identifiant_fiche_conformite: FC-IR-2024
+        statut_dcpod: en_cours
+        donnees_personnelles:
+          contient_donnees_personnelles: oui
+          contient_donnees_sensibles_rgpd: non
+          contient_donnees_particulieres: oui
+        conservation_et_purge:
+          duree_conservation: 6 ans
+          duree_source_dcpod: 6 ans
+          date_purge_previsionnelle: '2032-12-31'
+      transverse:
+        securite: Chiffrement + contrôle d'accès + logs
+        incidents:
+          procedure_gestion_violation: PROC-SSI-001
+          delai_notification: 72h
+    habilitations:
+      utilisateurs:
+        comptes_applicatifs:
+          - identifiant: ir-api-prod
+            droits: lecture
+            periode_acces:
+              debut: '2026-01-01'
+              fin: '2026-12-31'
+        comptes_nominatifs:
+          - identifiant: jean.dupont
+            droits: lecture
+            periode_acces:
+              debut: '2026-01-01'
+              fin: '2026-06-30'
+        journalisation:
+          suivi_habilitation: LOG-IR-ACCESS
+          conservation_journaux: 12 mois
+      re_utilisateurs:
+        comptes_applicatifs: []
+        comptes_nominatifs: []
+        journalisation:
+          suivi_habilitation: LOG-IR-ACCESS
+          conservation_journaux: 12 mois
+dependances_couloirs:
+  - ''
+  - ''
+  - ''
+politique_diffusion:
+  - ''
+  - ''

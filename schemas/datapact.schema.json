@@ -1,0 +1,347 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DataPact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "identification", "parties", "duree_du_datapact", "donnees", "statut_datapact"],
+  "properties": {
+    "DataPact": { "type": "string" },
+    "id": { "type": "string" },
+    "statut_datapact": { "type": "string", "enum": ["brouillon", "en_validation", "valide", "expire", "retire"] },
+    "workflow": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/workflow_event" }
+    },
+    "identification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nom_couloir", "type_couloir", "version"],
+      "properties": {
+        "nom_couloir": { "type": "string" },
+        "type_couloir": { "type": "string", "enum": ["Ingestion", "Experimentation", "Valorisation"] },
+        "jeu_donnees": { "type": "string" },
+        "version": { "type": "string" },
+        "environnement": { "type": "string", "enum": ["Dev", "IIA", "INTEX", "Prod"] }
+      }
+    },
+    "parties": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "administration_du_lac": { "$ref": "#/definitions/equipe_contact" },
+        "administrateur_gouvernance": { "$ref": "#/definitions/equipe_contact" },
+        "responsables": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "responsable_couloir": { "$ref": "#/definitions/contact" },
+            "responsable_donnees": { "$ref": "#/definitions/contact" },
+            "responsable_traitement": { "$ref": "#/definitions/contact" }
+          }
+        }
+      }
+    },
+    "duree_du_datapact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duree_contrat", "date_effet", "date_fin"],
+      "properties": {
+        "duree_contrat": { "type": "string" },
+        "date_effet": { "type": "string", "format": "date" },
+        "date_fin": { "type": "string", "format": "date" }
+      }
+    },
+    "donnees": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/donnee" }
+    },
+    "cas_d_usage": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/cas_usage" }
+    },
+    "dependances_couloirs": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/dependance" }
+    },
+    "politique_diffusion": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/diffusion" }
+    },
+    "habilitations": { "$ref": "#/definitions/habilitations" }
+  },
+  "definitions": {
+    "workflow_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "acteur", "decision", "statut"],
+      "properties": {
+        "date": { "type": "string", "format": "date-time" },
+        "acteur": { "type": "string" },
+        "decision": { "type": "string" },
+        "statut": { "type": "string" }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nom": { "type": "string" },
+        "email": { "type": "string" },
+        "telephone": { "type": "string" },
+        "tchap": { "type": "string" },
+        "coordonnees": { "type": "string" }
+      }
+    },
+    "equipe_contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "equipe": { "type": "string" },
+        "contact": { "type": "string" }
+      }
+    },
+    "periode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["debut", "fin"],
+      "properties": {
+        "debut": { "type": "string", "format": "date" },
+        "fin": { "type": "string", "format": "date" }
+      }
+    },
+    "donnee": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "nom", "finalite_associee", "gouvernance"],
+      "properties": {
+        "id": { "type": "string" },
+        "nom": { "type": "string" },
+        "description": { "type": "string" },
+        "finalite_associee": { "type": "string" },
+        "utilisateurs": { "$ref": "#/definitions/utilisateurs" },
+        "habilitations": { "$ref": "#/definitions/habilitations" },
+        "gouvernance": { "$ref": "#/definitions/gouvernance" }
+      }
+    },
+    "utilisateurs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "comptes_applicatifs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/utilisateur" }
+        },
+        "comptes_nominatifs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/utilisateur" }
+        }
+      }
+    },
+    "utilisateur": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifiant"],
+      "properties": {
+        "identifiant": { "type": "string" }
+      }
+    },
+    "habilitation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifiant", "droits", "periode_acces"],
+      "properties": {
+        "identifiant": { "type": "string" },
+        "droits": { "type": "string", "enum": ["lecture", "lecture_ecriture"] },
+        "periode_acces": { "$ref": "#/definitions/periode" }
+      }
+    },
+    "habilitations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "utilisateurs": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "comptes_applicatifs": { "type": "array", "items": { "$ref": "#/definitions/habilitation" } },
+            "comptes_nominatifs": { "type": "array", "items": { "$ref": "#/definitions/habilitation" } }
+          }
+        },
+        "re_utilisateurs": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "comptes_applicatifs": { "type": "array", "items": { "$ref": "#/definitions/habilitation" } },
+            "comptes_nominatifs": { "type": "array", "items": { "$ref": "#/definitions/habilitation" } }
+          }
+        }
+      }
+    },
+    "gouvernance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["localisation", "conformite"],
+      "properties": {
+        "localisation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "zone_du_couloir": { "type": "string", "enum": ["brut", "bronze", "argent", "or"] },
+            "chemin_dossier": { "type": "string" },
+            "fichiers": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "identifiant_fichier": { "type": "string" },
+                "nom_fichier_declare": { "type": "string" },
+                "format": { "type": "string" },
+                "processus_ingestion": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "nom": { "type": "string" },
+                    "description": { "type": "string" },
+                    "dates_ingestion": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "date_premiere_ingestion": { "type": "string", "format": "date" },
+                        "date_derniere_ingestion": { "type": "string", "format": "date-time" }
+                      }
+                    },
+                    "frequence_mise_a_jour": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "connaissance": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "chemin_carto": { "type": "string" },
+            "catalogue_donnees": { "type": "string" },
+            "liste_metadonnees": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "qualite": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "indicateurs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "nom_indicateur": { "type": "string" },
+                  "description": { "type": "string" },
+                  "type_indicateur": { "type": "string" },
+                  "granularite": { "type": "string" },
+                  "script_calcul": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "nom": { "type": "string" },
+                      "version": { "type": "string" }
+                    }
+                  },
+                  "valeur_cible_alerte": { "type": "string" },
+                  "objectif": { "type": "string" },
+                  "dernier_calcul": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "date": { "type": "string", "format": "date" },
+                      "resultat": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "frequence_calcul": { "type": "string" }
+          }
+        },
+        "conformite": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "finalite_principale": { "type": "string" },
+            "fondement_juridique": { "type": "string" },
+            "identifiant_dcpod": { "type": "string" },
+            "identifiant_fiche_conformite": { "type": "string" },
+            "statut_dcpod": { "type": "string", "enum": ["a_faire", "en_cours", "valide"] },
+            "donnees_personnelles": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "contient_donnees_personnelles": { "type": "string", "enum": ["oui", "non", "inconnu"] },
+                "contient_donnees_sensibles_rgpd": { "type": "string", "enum": ["oui", "non", "inconnu"] },
+                "contient_donnees_particulieres": { "type": "string", "enum": ["oui", "non", "inconnu"] }
+              }
+            },
+            "conservation_et_purge": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "duree_conservation": { "type": "string" },
+                "duree_source_dcpod": { "type": "string" },
+                "date_purge_previsionnelle": { "type": "string", "format": "date" }
+              }
+            }
+          }
+        },
+        "transverse": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "securite": { "type": "string" },
+            "incidents": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "procedure_gestion_violation": { "type": "string" },
+                "delai_notification": { "type": "string" },
+                "statut": { "type": "string", "enum": ["declare", "analyse", "corrige", "cloture"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "cas_usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "finalite", "periode", "donnees_ids"],
+      "properties": {
+        "id": { "type": "string" },
+        "finalite": { "type": "string" },
+        "periode": { "$ref": "#/definitions/periode" },
+        "donnees_ids": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "dependance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["couloir_source", "jeu_donnees", "finalite", "duree"],
+      "properties": {
+        "couloir_source": { "type": "string" },
+        "jeu_donnees": { "type": "string" },
+        "finalite": { "type": "string" },
+        "duree": { "$ref": "#/definitions/periode" }
+      }
+    },
+    "diffusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["couloir_cible", "perimetre_donnees", "duree_autorisation", "justification"],
+      "properties": {
+        "couloir_cible": { "type": "string" },
+        "perimetre_donnees": { "type": "string" },
+        "duree_autorisation": { "$ref": "#/definitions/periode" },
+        "justification": { "type": "string" }
+      }
+    }
+  }
+}

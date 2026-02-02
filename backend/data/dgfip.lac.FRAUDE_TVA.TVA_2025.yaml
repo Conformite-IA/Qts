@@ -1,0 +1,225 @@
+DataPact: "0.1"
+id: "dgfip.lac.FRAUDE_TVA.TVA_2025"
+statut_datapact: "valide"
+
+identification:
+  nom_couloir: "FRAUDE_TVA"
+  type_couloir: "Ingestion"
+  jeu_donnees: "TVA_2025"
+  version: "1.0.0"
+  environnement: "Prod"
+
+parties:
+  administration_du_lac:
+    equipe: "Admin LAC TVA"
+    contact: "balf-lac-tva@dgfip.finances.gouv.fr"
+  administrateur_gouvernance:
+    equipe: "Gouvernance Donnees"
+    contact: "dtnum.donnees.gouvernance@dgfip.finances.gouv.fr"
+  responsables:
+    responsable_couloir:
+      nom: "Resp Couloir TVA"
+      email: "resp.tva@dgfip.finances.gouv.fr"
+      telephone: "01 40 00 10 10"
+      tchap: "@resp.tva"
+    responsable_donnees:
+      nom: "Resp Donnees TVA"
+      email: "resp.donnees.tva@dgfip.finances.gouv.fr"
+      telephone: "01 40 00 10 11"
+      tchap: "@resp.donnees.tva"
+    responsable_traitement:
+      nom: "Resp Traitement TVA"
+      coordonnees: "DGFiP - TVA"
+      telephone: "01 40 00 10 12"
+      tchap: "@resp.traitement.tva"
+
+duree_du_datapact:
+  duree_contrat: "3 ans"
+  date_effet: "2025-01-01"
+  date_fin: "2027-12-31"
+
+donnees:
+  - id: "TVA_BRUT_2025"
+    nom: "Flux TVA brut 2025"
+    description: "Déclarations TVA brutes issues des collectes mensuelles."
+    finalite_associee: "Détection précoce des anomalies TVA"
+    utilisateurs:
+      comptes_applicatifs:
+        - identifiant: "app_tva_ingest"
+      comptes_nominatifs:
+        - identifiant: "prenom.nom"
+    habilitations:
+      utilisateurs:
+        comptes_applicatifs:
+          - identifiant: "app_tva_ingest"
+            droits: "lecture_ecriture"
+            periode_acces:
+              debut: "2025-01-01"
+              fin: "2026-12-31"
+        comptes_nominatifs:
+          - identifiant: "prenom.nom"
+            droits: "lecture"
+            periode_acces:
+              debut: "2025-01-01"
+              fin: "2025-12-31"
+      re_utilisateurs:
+        comptes_applicatifs:
+          - identifiant: "app_analytique_tva"
+            droits: "lecture"
+            periode_acces:
+              debut: "2025-02-01"
+              fin: "2026-12-31"
+    gouvernance:
+      localisation:
+        zone_du_couloir: "brut"
+        chemin_dossier: "/lac/fraude_tva/bronze/tva_brut_2025/"
+        fichiers:
+          identifiant_fichier: "tva_brut_2025"
+          nom_fichier_declare: "tva_brut_2025.parquet"
+          format: "parquet"
+          processus_ingestion:
+            nom: "ingest_tva_brut"
+            description: "Ingestion quotidienne des déclarations TVA."
+            dates_ingestion:
+              date_premiere_ingestion: "2025-01-02"
+              date_derniere_ingestion: "2025-12-20T01:15:00Z"
+            frequence_mise_a_jour: "quotidienne"
+      connaissance:
+        chemin_carto: "https://carto.dgfip/lac/fraude_tva"
+        catalogue_donnees: "CAT-REF-TVA-2025"
+        liste_metadonnees:
+          - "num_declaration"
+          - "siret"
+          - "montant_tva"
+      qualite:
+        indicateurs:
+          - nom_indicateur: "completude_lignes"
+            description: "Taux de lignes complètes"
+            type_indicateur: "taux"
+            granularite: "jour"
+            script_calcul:
+              nom: "qualite_tva_brut"
+              version: "1.2.0"
+            valeur_cible_alerte: "98%"
+            objectif: "99%"
+            dernier_calcul:
+              date: "2025-12-20"
+              resultat: "98.7%"
+        frequence_calcul: "quotidienne"
+      conformite:
+        finalite_principale: "Lutte contre la fraude TVA"
+        fondement_juridique: "CGI art. 287"
+        identifiant_dcpod: "DCPOD-2025-TVA-001"
+        identifiant_fiche_conformite: "FC-2025-001"
+        statut_dcpod: "valide"
+        donnees_personnelles:
+          contient_donnees_personnelles: "oui"
+          contient_donnees_sensibles_rgpd: "non"
+          contient_donnees_particulieres: "non"
+        conservation_et_purge:
+          duree_conservation: "36 mois"
+          duree_source_dcpod: "36 mois"
+          date_purge_previsionnelle: "2028-01-31"
+      transverse:
+        securite: "Chiffrement au repos et en transit."
+        incidents:
+          procedure_gestion_violation: "PROC-INC-TVA-01"
+          delai_notification: "72h"
+          statut: "cloture"
+  - id: "TVA_CONTROLE_2025"
+    nom: "TVA contrôles ciblés 2025"
+    description: "Sorties enrichies avec contrôles et scores de risque."
+    finalite_associee: "Priorisation des contrôles"
+    utilisateurs:
+      comptes_applicatifs:
+        - identifiant: "app_tva_control"
+      comptes_nominatifs:
+        - identifiant: "agent.controleur"
+    habilitations:
+      utilisateurs:
+        comptes_applicatifs:
+          - identifiant: "app_tva_control"
+            droits: "lecture_ecriture"
+            periode_acces:
+              debut: "2025-02-01"
+              fin: "2026-12-31"
+        comptes_nominatifs:
+          - identifiant: "agent.controleur"
+            droits: "lecture"
+            periode_acces:
+              debut: "2025-02-01"
+              fin: "2025-12-31"
+      re_utilisateurs:
+        comptes_applicatifs:
+          - identifiant: "app_recouvrement"
+            droits: "lecture"
+            periode_acces:
+              debut: "2025-03-01"
+              fin: "2026-12-31"
+    gouvernance:
+      localisation:
+        zone_du_couloir: "argent"
+        chemin_dossier: "/lac/fraude_tva/argent/tva_controle_2025/"
+        fichiers:
+          identifiant_fichier: "tva_controle_2025"
+          nom_fichier_declare: "tva_controle_2025.parquet"
+          format: "parquet"
+          processus_ingestion:
+            nom: "build_tva_controle"
+            description: "Agrégation et scoring des contrôles TVA."
+            dates_ingestion:
+              date_premiere_ingestion: "2025-02-10"
+              date_derniere_ingestion: "2025-12-20T02:00:00Z"
+            frequence_mise_a_jour: "quotidienne"
+      conformite:
+        finalite_principale: "Lutte contre la fraude TVA"
+        fondement_juridique: "CGI art. 287"
+        identifiant_dcpod: "DCPOD-2025-TVA-002"
+        identifiant_fiche_conformite: "FC-2025-002"
+        statut_dcpod: "valide"
+        donnees_personnelles:
+          contient_donnees_personnelles: "oui"
+          contient_donnees_sensibles_rgpd: "non"
+          contient_donnees_particulieres: "non"
+        conservation_et_purge:
+          duree_conservation: "36 mois"
+          duree_source_dcpod: "36 mois"
+          date_purge_previsionnelle: "2028-02-28"
+
+cas_d_usage:
+  - id: "CU_TVA_2025_ANOMALIES"
+    finalite: "Détection anomalies TVA"
+    periode:
+      debut: "2025-01-01"
+      fin: "2025-12-31"
+    donnees_ids:
+      - "TVA_BRUT_2025"
+      - "TVA_CONTROLE_2025"
+
+dependances_couloirs:
+  - couloir_source: "COULEUR_IR"
+    jeu_donnees: "IR_2024"
+    finalite: "Enrichissement risque"
+    duree:
+      debut: "2025-01-01"
+      fin: "2025-12-31"
+
+politique_diffusion:
+  - couloir_cible: "REC_DOSSIERS"
+    perimetre_donnees: "TVA_CONTROLE_2025"
+    duree_autorisation:
+      debut: "2025-03-01"
+      fin: "2026-12-31"
+    justification: "Transmission contrôles pour recouvrement"
+  - couloir_cible: "FRAUDE_ANALYTICS"
+    perimetre_donnees: "TVA_BRUT_2025, TVA_CONTROLE_2025"
+    duree_autorisation:
+      debut: "2025-02-01"
+      fin: "2027-12-31"
+    justification: "Analyses avancées fraude"
+
+workflow:
+  - date: "2025-01-15T10:00:00Z"
+    acteur: "resp.tva"
+    decision: "Validation initiale"
+    statut: "valide"

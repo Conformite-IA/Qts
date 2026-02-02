@@ -1,0 +1,150 @@
+DataPact: "0.1"
+id: "dgfip.lac.RECOUVREMENT.REC_2025"
+statut_datapact: "valide"
+
+identification:
+  nom_couloir: "RECOUVREMENT"
+  type_couloir: "Valorisation"
+  jeu_donnees: "REC_2025"
+  version: "1.0.0"
+  environnement: "Prod"
+
+parties:
+  administration_du_lac:
+    equipe: "Admin LAC Recouvrement"
+    contact: "balf-lac-rec@dgfip.finances.gouv.fr"
+  administrateur_gouvernance:
+    equipe: "Gouvernance Donnees"
+    contact: "dtnum.donnees.gouvernance@dgfip.finances.gouv.fr"
+  responsables:
+    responsable_couloir:
+      nom: "Resp Couloir Rec"
+      email: "resp.rec@dgfip.finances.gouv.fr"
+      telephone: "01 42 00 20 10"
+      tchap: "@resp.rec"
+    responsable_donnees:
+      nom: "Resp Donnees Rec"
+      email: "resp.donnees.rec@dgfip.finances.gouv.fr"
+      telephone: "01 42 00 20 11"
+      tchap: "@resp.donnees.rec"
+    responsable_traitement:
+      nom: "Resp Traitement Rec"
+      coordonnees: "DGFiP - Recouvrement"
+      telephone: "01 42 00 20 12"
+      tchap: "@resp.traitement.rec"
+
+duree_du_datapact:
+  duree_contrat: "2 ans"
+  date_effet: "2025-03-01"
+  date_fin: "2027-02-28"
+
+donnees:
+  - id: "REC_DOSSIERS_2025"
+    nom: "Dossiers de recouvrement 2025"
+    description: "Dossiers consolidés avec scores fraude."
+    finalite_associee: "Pilotage du recouvrement"
+    utilisateurs:
+      comptes_applicatifs:
+        - identifiant: "app_recouvrement"
+      comptes_nominatifs:
+        - identifiant: "agent.recouvrement"
+    habilitations:
+      utilisateurs:
+        comptes_applicatifs:
+          - identifiant: "app_recouvrement"
+            droits: "lecture_ecriture"
+            periode_acces:
+              debut: "2025-03-01"
+              fin: "2026-12-31"
+        comptes_nominatifs:
+          - identifiant: "agent.recouvrement"
+            droits: "lecture"
+            periode_acces:
+              debut: "2025-03-01"
+              fin: "2025-12-31"
+      re_utilisateurs:
+        comptes_applicatifs:
+          - identifiant: "app_reporting_rec"
+            droits: "lecture"
+            periode_acces:
+              debut: "2025-04-01"
+              fin: "2026-12-31"
+    gouvernance:
+      localisation:
+        zone_du_couloir: "or"
+        chemin_dossier: "/lac/recouvrement/or/rec_dossiers_2025/"
+        fichiers:
+          identifiant_fichier: "rec_dossiers_2025"
+          nom_fichier_declare: "rec_dossiers_2025.parquet"
+          format: "parquet"
+          processus_ingestion:
+            nom: "build_rec_dossiers"
+            description: "Consolidation des dossiers recouvrement."
+            dates_ingestion:
+              date_premiere_ingestion: "2025-03-05"
+              date_derniere_ingestion: "2025-12-20T03:00:00Z"
+            frequence_mise_a_jour: "hebdomadaire"
+      connaissance:
+        chemin_carto: "https://carto.dgfip/lac/recouvrement"
+        catalogue_donnees: "CAT-REC-2025"
+        liste_metadonnees:
+          - "num_dossier"
+          - "siret"
+          - "score_fraude"
+      conformite:
+        finalite_principale: "Recouvrement fiscal"
+        fondement_juridique: "LPF art. L257"
+        identifiant_dcpod: "DCPOD-2025-REC-001"
+        identifiant_fiche_conformite: "FC-2025-REC-001"
+        statut_dcpod: "valide"
+        donnees_personnelles:
+          contient_donnees_personnelles: "oui"
+          contient_donnees_sensibles_rgpd: "non"
+          contient_donnees_particulieres: "non"
+        conservation_et_purge:
+          duree_conservation: "24 mois"
+          duree_source_dcpod: "24 mois"
+          date_purge_previsionnelle: "2027-03-31"
+
+cas_d_usage:
+  - id: "CU_REC_2025_PRIORISATION"
+    finalite: "Priorisation des dossiers"
+    periode:
+      debut: "2025-03-01"
+      fin: "2026-12-31"
+    donnees_ids:
+      - "REC_DOSSIERS_2025"
+
+dependances_couloirs:
+  - couloir_source: "FRAUDE_TVA"
+    jeu_donnees: "TVA_2025"
+    finalite: "Enrichissement fraude"
+    duree:
+      debut: "2025-03-01"
+      fin: "2026-12-31"
+  - couloir_source: "COULEUR_IR"
+    jeu_donnees: "IR_2024"
+    finalite: "Croisement fiscal"
+    duree:
+      debut: "2025-03-01"
+      fin: "2025-12-31"
+
+politique_diffusion:
+  - couloir_cible: "REC_REPORTING"
+    perimetre_donnees: "REC_DOSSIERS_2025"
+    duree_autorisation:
+      debut: "2025-04-01"
+      fin: "2026-12-31"
+    justification: "Reporting et pilotage DGFiP"
+  - couloir_cible: "FRAUDE_ANALYTICS"
+    perimetre_donnees: "REC_DOSSIERS_2025"
+    duree_autorisation:
+      debut: "2025-04-01"
+      fin: "2026-12-31"
+    justification: "Analyse inter-couloirs fraude"
+
+workflow:
+  - date: "2025-03-10T08:00:00Z"
+    acteur: "resp.rec"
+    decision: "Validation initiale"
+    statut: "valide"

@@ -1,0 +1,183 @@
+DataPact: "0.1"
+id: "dgfip.lac.RISQUE.RISK_2025"
+statut_datapact: "valide"
+
+identification:
+  nom_couloir: "RISQUE"
+  type_couloir: "Experimentation"
+  jeu_donnees: "RISK_2025"
+  version: "1.0.0"
+  environnement: "Prod"
+
+parties:
+  administration_du_lac:
+    equipe: "Admin LAC Risque"
+    contact: "balf-lac-risque@dgfip.finances.gouv.fr"
+  administrateur_gouvernance:
+    equipe: "Gouvernance Donnees"
+    contact: "dtnum.donnees.gouvernance@dgfip.finances.gouv.fr"
+  responsables:
+    responsable_couloir:
+      nom: "Resp Couloir Risque"
+      email: "resp.risque@dgfip.finances.gouv.fr"
+      telephone: "01 43 00 30 10"
+      tchap: "@resp.risque"
+    responsable_donnees:
+      nom: "Resp Donnees Risque"
+      email: "resp.donnees.risque@dgfip.finances.gouv.fr"
+      telephone: "01 43 00 30 11"
+      tchap: "@resp.donnees.risque"
+    responsable_traitement:
+      nom: "Resp Traitement Risque"
+      coordonnees: "DGFiP - Risque"
+      telephone: "01 43 00 30 12"
+      tchap: "@resp.traitement.risque"
+
+duree_du_datapact:
+  duree_contrat: "2 ans"
+  date_effet: "2025-02-01"
+  date_fin: "2027-01-31"
+
+donnees:
+  - id: "RISK_SCORE_2025"
+    nom: "Scores de risque consolidés"
+    description: "Scores de risque consolidés multi-sources."
+    finalite_associee: "Priorisation contrôles et recouvrement"
+    utilisateurs:
+      comptes_applicatifs:
+        - identifiant: "app_risque"
+      comptes_nominatifs:
+        - identifiant: "analyste.risque"
+    habilitations:
+      utilisateurs:
+        comptes_applicatifs:
+          - identifiant: "app_risque"
+            droits: "lecture_ecriture"
+            periode_acces:
+              debut: "2025-02-01"
+              fin: "2026-12-31"
+        comptes_nominatifs:
+          - identifiant: "analyste.risque"
+            droits: "lecture"
+            periode_acces:
+              debut: "2025-02-01"
+              fin: "2025-12-31"
+      re_utilisateurs:
+        comptes_applicatifs:
+          - identifiant: "app_fraude_analytics"
+            droits: "lecture"
+            periode_acces:
+              debut: "2025-03-01"
+              fin: "2026-12-31"
+    gouvernance:
+      localisation:
+        zone_du_couloir: "argent"
+        chemin_dossier: "/lac/risque/argent/risk_score_2025/"
+        fichiers:
+          identifiant_fichier: "risk_score_2025"
+          nom_fichier_declare: "risk_score_2025.parquet"
+          format: "parquet"
+          processus_ingestion:
+            nom: "build_risk_score"
+            description: "Consolidation de scores multi-couloirs."
+            dates_ingestion:
+              date_premiere_ingestion: "2025-02-05"
+              date_derniere_ingestion: "2025-12-20T04:00:00Z"
+            frequence_mise_a_jour: "quotidienne"
+      connaissance:
+        chemin_carto: "https://carto.dgfip/lac/risque"
+        catalogue_donnees: "CAT-RISK-2025"
+        liste_metadonnees:
+          - "id_score"
+          - "siret"
+          - "score"
+      qualite:
+        indicateurs:
+          - nom_indicateur: "fraicheur_score"
+            description: "Fraîcheur moyenne du score"
+            type_indicateur: "score"
+            granularite: "jour"
+            script_calcul:
+              nom: "qualite_risk_score"
+              version: "1.0.0"
+            valeur_cible_alerte: "95%"
+            objectif: "98%"
+            dernier_calcul:
+              date: "2025-12-20"
+              resultat: "96%"
+        frequence_calcul: "quotidienne"
+      conformite:
+        finalite_principale: "Evaluation du risque fiscal"
+        fondement_juridique: "LPF art. L10"
+        identifiant_dcpod: "DCPOD-2025-RISK-001"
+        identifiant_fiche_conformite: "FC-2025-RISK-001"
+        statut_dcpod: "valide"
+        donnees_personnelles:
+          contient_donnees_personnelles: "oui"
+          contient_donnees_sensibles_rgpd: "non"
+          contient_donnees_particulieres: "non"
+        conservation_et_purge:
+          duree_conservation: "24 mois"
+          duree_source_dcpod: "24 mois"
+          date_purge_previsionnelle: "2027-02-28"
+      transverse:
+        securite: "Contrôles d'accès renforcés."
+        incidents:
+          procedure_gestion_violation: "PROC-INC-RISK-01"
+          delai_notification: "72h"
+          statut: "analyse"
+
+cas_d_usage:
+  - id: "CU_RISK_2025_SCORE"
+    finalite: "Construction score multi-couloirs"
+    periode:
+      debut: "2025-02-01"
+      fin: "2026-12-31"
+    donnees_ids:
+      - "RISK_SCORE_2025"
+
+dependances_couloirs:
+  - couloir_source: "FRAUDE_TVA"
+    jeu_donnees: "TVA_2025"
+    finalite: "Scores fraude TVA"
+    duree:
+      debut: "2025-02-01"
+      fin: "2026-12-31"
+  - couloir_source: "RECOUVREMENT"
+    jeu_donnees: "REC_2025"
+    finalite: "Scores recouvrement"
+    duree:
+      debut: "2025-03-01"
+      fin: "2026-12-31"
+  - couloir_source: "COULEUR_IR"
+    jeu_donnees: "IR_2024"
+    finalite: "Historique fiscal"
+    duree:
+      debut: "2025-02-01"
+      fin: "2025-12-31"
+
+politique_diffusion:
+  - couloir_cible: "FRAUDE_ANALYTICS"
+    perimetre_donnees: "RISK_SCORE_2025"
+    duree_autorisation:
+      debut: "2025-03-01"
+      fin: "2026-12-31"
+    justification: "Analyses avancées multi-couloirs"
+  - couloir_cible: "REC_REPORTING"
+    perimetre_donnees: "RISK_SCORE_2025"
+    duree_autorisation:
+      debut: "2025-03-01"
+      fin: "2026-12-31"
+    justification: "Pilotage des actions recouvrement"
+  - couloir_cible: "EXPERIMENTATION_IA"
+    perimetre_donnees: "RISK_SCORE_2025"
+    duree_autorisation:
+      debut: "2025-04-01"
+      fin: "2025-12-31"
+    justification: "Tests IA explicabilité"
+
+workflow:
+  - date: "2025-02-10T09:30:00Z"
+    acteur: "resp.risque"
+    decision: "Validation initiale"
+    statut: "valide"

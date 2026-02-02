@@ -1,0 +1,37 @@
+{
+  "items": {
+    "dgfip.lac.COULEUR_IR.IR_2024": {
+      "id": "dgfip.lac.COULEUR_IR.IR_2024",
+      "couloir": "COULOIR_IR",
+      "type_couloir": "Ingestion",
+      "jeu_donnees": "IR_2024",
+      "environnement": "Prod",
+      "version": "1.0.0",
+      "updated_at": "20260129T162717Z",
+      "latest_path": "dgfip.lac.COULEUR_IR.IR_2024.20260129T162717Z.yaml",
+      "responsable_donnees": "resp.donnees@dgfip.finances.gouv.fr"
+    },
+    "dgfip.lac.FRAUDE_TVA.TVA_2024": {
+      "id": "dgfip.lac.FRAUDE_TVA.TVA_2024",
+      "couloir": "FRAUDE_TVA-2025",
+      "type_couloir": "Ingestion",
+      "jeu_donnees": "TVA_2024",
+      "environnement": "Prod",
+      "version": "1.0.0",
+      "updated_at": "20260131T001730Z",
+      "latest_path": "dgfip.lac.FRAUDE_TVA.TVA_2024.20260131T001730Z.yaml",
+      "responsable_donnees": "resp.donnees.tva@dgfip.finances.gouv.fr"
+    },
+    "DataPact_sections": {
+      "id": "DataPact_sections",
+      "couloir": "Couloir",
+      "type_couloir": "Ingestion",
+      "jeu_donnees": "Donnees",
+      "environnement": "IIA",
+      "version": "1",
+      "updated_at": "20260131T002953Z",
+      "latest_path": "DataPact_sections.20260131T002953Z.yaml",
+      "responsable_donnees": null
+    }
+  }
+}
