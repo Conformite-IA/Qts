@@ -12,3 +12,5 @@ npm run dev
 
 UI: http://localhost:5173
 Backend attendu: http://localhost:8000
+npm install
+npm run build
