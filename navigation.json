@@ -1,0 +1,347 @@
+{
+  "version": "1.0.0",
+  "regles": [
+    {
+      "question_id": "RIA-01",
+      "reponses": {
+        "oui": {
+          "action": "stop",
+          "message": "Le système est concerné par une pratique interdite. Le questionnaire ne peut pas se poursuivre. Vous devez adapter ou abandonner le projet."
+        },
+        "non": {
+          "action": "next",
+          "message": "Le système n'est concerné par aucune pratique interdite. Passage au volet RGPD."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-01",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Le SIA traite des données personnelles. Les questions RGPD s'appliquent."
+        },
+        "non": {
+          "action": "skip_section",
+          "cible": "RGPD",
+          "message": "Le volet RGPD ne s'applique pas car le SIA ne traite aucune donnée personnelle."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-02",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Le cadre juridique est défini."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-03",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "La finalité est déterminée."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-04",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "La base légale est identifiée."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-05",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "La durée de conservation est définie."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-06",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Le traitement respecte le principe de minimisation."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-07",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Des données sensibles ou biométriques sont traitées. Passez aux mesures juridiques."
+        },
+        "non": {
+          "action": "goto",
+          "cible": "RGPD-09",
+          "message": "Pas de données sensibles. Passage direct à l'AIPD."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-08",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Les mesures juridiques sont en place."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-09",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "L'AIPD a été réalisée."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-10",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Les droits des personnes sont respectés."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-11",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Les mesures de sécurité sont en place."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RGPD-12",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Les données peuvent être anonymisées. Passage au volet IA Act - Classification des risques."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-02",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Le SIA est à risque limité."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-03",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Le SIA présente un risque systémique. Des mesures renforcées s'appliquent."
+        },
+        "non": {
+          "action": "goto",
+          "cible": "RIA-08",
+          "message": "Pas de risque systémique. Passage aux garanties de transparence."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-04",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Le SIA est à haut risque. Des exigences renforcées s'appliquent."
+        },
+        "non": {
+          "action": "goto",
+          "cible": "RIA-06",
+          "message": "Le SIA n'est pas à haut risque. Passage à l'autonomie du SIA."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-05",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Les démarches administratives sont réalisées."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-06",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "L'auto-optimisation est encadrée."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-07",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Les règles d'auto-limitation sont en place."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-08",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Les garanties de transparence sont prévues."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-09",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Le suivi de conformité est prévu."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-10",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "L'intervention humaine est garantie."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "RIA-11",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "L'éthique est intégrée au SIA."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "AFNOR-01",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Les mesures de frugalité sont prises."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "AFNOR-02",
+      "reponses": {
+        "oui": {
+          "action": "next",
+          "message": "Le réentraînement est encadré."
+        },
+        "non": {
+          "action": "next",
+          "message": "Prenez les mesures correctives puis passez à la suite."
+        }
+      }
+    },
+    {
+      "question_id": "TRANS-01",
+      "reponses": {
+        "oui": {
+          "action": "end",
+          "message": "Questionnaire terminé. Passage au bilan de conformité."
+        },
+        "non": {
+          "action": "end",
+          "message": "Prenez les mesures correctives. Passage au bilan de conformité."
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,758 @@
+{
+  "version": "1.0.0",
+  "date": "2026-02-14",
+  "titre": "Questionnaire de conformité réglementaire pour les systèmes d'IA",
+  "commanditaire": "DGFIP",
+  "questions": [
+    {
+      "id": "RIA-01",
+      "volet": "IA Act",
+      "etape": "Définition du SIA",
+      "question": "Le système d'IA (ci-après : SIA) est-il concerné par une pratique interdite selon l'IA Act ?",
+      "type": "oui_non",
+      "criticite": "bloquant",
+      "contexte": "Le Règlement sur l'IA prévoit que le système d'IA s'entend comme ayant différents niveaux d'autonomie, qui peut faire preuve d'adaptabilité après son déploiement, et qui génère des résultats (prédictions, contenu, des recommandations).\n\nL'article 5 de l'AI Act liste l'ensemble des pratiques interdites que sont notamment :\n→ les techniques de surveillance biométrique, de notation sociale, de manipulation subliminales exploitant des vulnérabilités (liées à l'âge, au handicap ou à la situation sociale), ou toute technique susceptible de causer un préjudice important.",
+      "lien": "https://artificialintelligenceact.eu/fr/article/5/",
+      "mesures": {
+        "resume": "Adapter ou abandonner le projet pour éliminer la fonctionnalité interdite.",
+        "operatoire": [
+          "Adapter ou abandonner le projet pour éliminer la fonctionnalité interdite. Par exemple : désactiver le module de reconnaissance émotionnelle de l'assistant intelligent, ou le restreindre à un usage autorisé.",
+          "Si un doute subsiste sur le caractère interdit, demander l'avis du DPO ou de la CNIL."
+        ],
+        "detail": "L'article 5 de l'AI Act liste l'ensemble des pratiques interdites. Le non-respect entraîne l'arrêt immédiat du questionnaire car le système ne peut pas être déployé en l'état."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2025-02-02"
+    },
+    {
+      "id": "RGPD-01",
+      "volet": "RGPD",
+      "etape": "Point d'entrée",
+      "question": "Le SIA traite-t-il des données personnelles ou le modèle a-t-il eu accès à des données personnelles ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "Une donnée personnelle correspond à toute information se rapportant à une personne physique identifiée ou identifiable. Les coordonnées d'entreprises (ex : mail générique, adresse de l'entreprise) ne sont pas des données personnelles au sens de la CNIL.\n\nUn traitement de données personnelles comprend : la collecte, l'enregistrement, l'organisation, la conservation, la modification, l'extraction, la consultation, l'utilisation, la diffusion, l'effacement permettant d'identifier directement ou indirectement une personne physique.\n\nÀ l'inverse les agents IA sans état (Stateless) sont des systèmes qui traitent chaque interaction indépendamment, sans mémoire des échanges passés.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre1#Article4",
+      "mesures": {
+        "resume": "Vérifier le caractère identifiant et précis des données, la présence de données rares, uniques ou minoritaires, et le possible croisement d'un ensemble de données.",
+        "operatoire": [
+          "Vérifier le caractère identifiant et précis des données : identification directe (nom et prénom) ou indirecte (numéro de téléphone, numéro de sécurité sociale, adresse postale, image).",
+          "Vérifier la présence de données dites \"outliers\", aberrantes ou rares. Elles sont uniques ou minoritaires et donc personnelles.",
+          "Vérifier si le croisement d'un ensemble de données est possible. Si oui, elles sont personnelles et le traitement permettra une identification indirecte."
+        ],
+        "detail": "Une donnée personnelle correspond à toute information se rapportant à une personne physique identifiée ou identifiable, directement ou indirectement. Les données dites \"outliers\" sont uniques ou minoritaires et permettent à terme d'identifier spécifiquement une personne."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-02",
+      "volet": "RGPD",
+      "etape": "Cadre général du RGPD",
+      "question": "Le traitement de données à caractère personnel par le SIA a-t-il été prévu dans un cadre juridique bien défini ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "Le traitement de données à caractère personnel par le SIA implique de prévoir un cadre juridique clair afin d'assurer la conformité au RGPD dès la conception mais aussi garantir la confiance des personnes concernées dans ce SIA.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5",
+      "mesures": {
+        "resume": "Cartographier les données personnelles traitées, identifier les acteurs et établir des procédures de mise en conformité (privacy-by-design).",
+        "operatoire": [
+          "Identifier précisément les données personnelles traitées (données agents, usagers, etc.).",
+          "Nommer un DPO.",
+          "Déterminer les sous-traitants et formaliser des contrats (RGPD art. 28).",
+          "Organiser des processus internes de « privacy by design » (minimisation, finalité, conservation, sécurité, responsabilité).",
+          "Traitement des réclamations, anticipation des violations de données (notification à la CNIL dans les 72h et aux personnes concernées dans les meilleurs délais)."
+        ],
+        "detail": "Le cadre juridique doit couvrir l'identification des données, la nomination d'un DPO, la formalisation des contrats avec les sous-traitants, les processus de privacy by design, et les procédures de notification en cas de violation."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-03",
+      "volet": "RGPD",
+      "etape": "Cadre général du RGPD",
+      "question": "La finalité de traitement est-elle déterminée, explicite et légitime ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "La finalité est l'objectif principal du traitement des données.\n\nL'article 5.1 b RGPD : la finalité doit être déterminée, explicite et légitime dès le début du traitement.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5",
+      "mesures": {
+        "resume": "Cadrer textuellement le projet pour l'utilisation et la réutilisation des données.",
+        "operatoire": [
+          "Cadrer le projet avant la collecte : déterminer le but du fichier, spécifier les finalités les plus \"à risque\", décrire les capacités du système.",
+          "Identifier les personnes ayant vocation à interagir avec l'IA (âge, genre, vulnérabilités).",
+          "Si le système est un GPAI : cartographier les cas d'usages selon les finalités, le domaine, le destinataire, le modèle choisi.",
+          "Responsabilisation (facultatif) : signature d'une charte engageant à ne pas dépasser la destination du SIA."
+        ],
+        "detail": "Plusieurs finalités peuvent être déterminées dès lors qu'elles respectent l'article 5.1 du RGPD. Le système GPAI nécessite une cartographie plus détaillée des cas d'usage."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-04",
+      "volet": "RGPD",
+      "etape": "Cadre général du RGPD",
+      "question": "Une base légale valide a-t-elle été identifiée (principe de licéité du traitement) ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "La base légale correspond au fondement juridique qui permet de rendre légitime le traitement des données selon la finalité visée.\n\nPour la DGFIP, le plus souvent :\n- Le respect d'une obligation légale\n- L'exécution d'une mission d'intérêt public ou relevant de l'exercice de l'autorité publique\n- L'intérêt légitime\n\nL'article 6 du RGPD liste les six bases légales possibles.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5",
+      "mesures": {
+        "resume": "Documenter et vérifier par finalité la base légale applicable.",
+        "operatoire": [
+          "Vérifier si une loi ou un règlement peut autoriser ce traitement.",
+          "À défaut, vérifier si le traitement est lié à une mission d'intérêt public.",
+          "En dernier lieu, vérifier si une autre base légale s'applique (consentement, intérêt légitime).",
+          "La base légale doit figurer dans les éléments d'information fournis aux personnes.",
+          "Documenter le choix de la base légale.",
+          "Pour les données sensibles (art. 9 RGPD) : vérifier qu'une exception s'applique."
+        ],
+        "detail": "Si aucune base légale n'est identifiée, suspendre le déploiement du système. Le choix de la base légale doit être documenté et communiqué aux personnes concernées. Le traitement de données sensibles est interdit sauf exceptions prévues à l'article 9 du RGPD."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-05",
+      "volet": "RGPD",
+      "etape": "Cadre général du RGPD",
+      "question": "Une durée de conservation des données a-t-elle été définie ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "Une durée de conservation des données doit être déterminée en fonction de l'objectif de la collecte.\n\nL'article 5 e) du RGPD : la durée ne doit pas excéder celle nécessaire au regard des finalités du traitement.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5",
+      "mesures": {
+        "resume": "Déterminer une durée de conservation selon l'objectif fixé et des règles de suppression.",
+        "operatoire": [
+          "Déterminer une durée de conservation selon l'objectif fixé.",
+          "Déterminer des règles et une procédure de suppression des données.",
+          "Déterminer les phases du cycle de vie d'une donnée (base active, archivage intermédiaire, archivage définitif).",
+          "Formaliser ces durées sous forme de tableau.",
+          "Mettre en place un processus d'effacement effectif et automatique.",
+          "Conserver une preuve de l'effacement pour justifier de la conformité."
+        ],
+        "detail": "Le RGPD ne donne pas de durées précises. Il appartient au responsable de traitement de les déterminer. Si certaines données doivent être conservées plus longtemps pour l'amélioration du système ou pour des statistiques, isoler ces données, anonymiser et encadrer strictement cet usage."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-06",
+      "volet": "RGPD",
+      "etape": "Cadre général du RGPD",
+      "question": "Le traitement est-il adéquat, pertinent et limité (minimisation des données) ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "La minimisation s'applique tout au long du traitement et permet de restreindre la collecte à ce qui est nécessaire au bon fonctionnement du système d'IA.\n\nArticle 5.1 c du RGPD : les données doivent être adéquates, pertinentes et limitées à ce qui est nécessaire au regard des finalités pour lesquelles elles sont traitées.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5",
+      "mesures": {
+        "resume": "Documenter les catégories de données et vérifier la minimisation pendant la collecte, les tests et l'utilisation.",
+        "operatoire": [
+          "Documenter les catégories de données selon les catégories de personnes et finalités.",
+          "Vérifier que la donnée visée n'est pas soumise à une restriction particulière (notamment par décret).",
+          "Si une journalisation est mise en œuvre, ne collecter que celles nécessaires à la traçabilité.",
+          "Au stade de l'utilisation, prévoir une veille et une purge des données régulière et documentée."
+        ],
+        "detail": "Pour le jeu de données d'entraînement, documenter la source et le filtrage. Si possible, utiliser des données fictives ou anonymisées. Les métriques doivent mesurer la performance et les conséquences pour les personnes concernées."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-07",
+      "volet": "RGPD",
+      "etape": "Nature des données traitées",
+      "question": "Les données traitées sont-elles sensibles ou biométriques ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "Les données sensibles sont définies à l'article 9 du RGPD et forment une catégorie particulière de données personnelles.\n\nLes données biométriques sont une sous-catégorie de ces données dites \"sensibles\" et regroupent celles relatives à des caractéristiques physiques, physiologiques ou comportementales (la voix permet de déduire : l'âge d'un individu, son sexe, ses origines, son éducation, ses ressentis, son état physique ou psychique).",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre1#Article4",
+      "mesures": {
+        "resume": "Vérifier si les données peuvent identifier une personne de manière unique et si le traitement comporte un risque élevé.",
+        "operatoire": [
+          "Vérifier que les données peuvent identifier une personne physique de manière unique.",
+          "Vérifier que le traitement comporte un risque élevé pour la vie privée et les droits fondamentaux.",
+          "Vérifier si les données relèvent de l'origine raciale, opinion politique, conviction religieuse, appartenance syndicale.",
+          "Vérifier si le traitement concerne des données génétiques ou biométriques.",
+          "Déterminer la composition du système (éléments matériels et logiciels).",
+          "Identifier les types de dispositifs biométriques (maîtrise exclusive personne, partagée, ou exclusive responsable)."
+        ],
+        "detail": "Il existe trois grands types de dispositifs biométriques : Type 1 (gabarit sous maîtrise exclusive de la personne), Type 2 (gabarit sous maîtrise partagée), Type 3 (gabarit sous maîtrise exclusive du responsable de traitement)."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-08",
+      "volet": "RGPD",
+      "etape": "Nature des données traitées",
+      "question": "Les mesures juridiques sont-elles prises pour le traitement de données sensibles ou biométriques ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "Une donnée sensible ou biométrique est intrinsèque à la personne concernée.\n\nLes données sensibles sont définies à l'article 9 du RGPD et forment une catégorie particulière de données personnelles.\n\nLes données biométriques regroupent celles relatives à des caractéristiques physiques, physiologiques ou comportementales.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre1#Article4",
+      "mesures": {
+        "resume": "Mettre en place des mesures de transparence, tracer les lignes rouges du projet et recueillir le consentement.",
+        "operatoire": [
+          "Mettre en place des mesures de transparence (informer sur les données traitées, mises à jour et dysfonctionnements).",
+          "Tracer les lignes rouges du projet avant tout usage expérimental du SIA.",
+          "Permettre à l'utilisateur de garder la main sur les données traitées et recueillir son consentement.",
+          "Démarche expérimentale pour tester et parfaire les solutions technologiques.",
+          "Réaliser les démarches administratives afférentes (décret en Conseil d'État, règlement type CNIL)."
+        ],
+        "detail": "Les démarches administratives comprennent la rédaction d'un décret en Conseil d'État après avis de la CNIL. Tout organisme public mettant en œuvre un traitement biométrique doit appliquer le règlement type de la CNIL."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-09",
+      "volet": "RGPD",
+      "etape": "Nature des données traitées",
+      "question": "Une Analyse d'Impact sur la Protection des Données (AIPD/DPIA) a-t-elle été réalisée ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "L'analyse d'impact consiste à évaluer les risques liés aux traitements de données personnelles, conformément à l'article 35 du RGPD, en identifiant, mesurant et limitant les risques pour la vie privée et en assurant la conformité des traitements.\n\nElle doit être menée avant la mise en œuvre du traitement et devra être mise à jour tout au long du cycle de vie du traitement.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre4#Article35",
+      "mesures": {
+        "resume": "Déterminer si une AIPD est nécessaire, accomplir la démarche de conformité et mettre en place des mesures de résilience.",
+        "operatoire": [
+          "Déterminer si une AIPD est nécessaire (liste CNIL des traitements à risque élevé, ou deux critères cumulatifs).",
+          "La démarche de conformité repose sur le respect des principes et droits fondamentaux et des mesures de gestion des risques.",
+          "Impliquer au moins : le DPO, un référent métier, un expert technique et un juriste.",
+          "Si l'analyse révèle des risques non atténués, saisir la CNIL pour avis avant mise en service.",
+          "Documenter l'évaluation si l'AIPD n'est pas jugée obligatoire."
+        ],
+        "detail": "L'AIPD est obligatoire si le traitement figure dans la liste CNIL ou répond à au moins deux critères parmi : évaluation/scoring, décision automatique avec effet légal, surveillance systématique, données sensibles, collecte à large échelle, croisement de données, personnes vulnérables, usage innovant, exclusion d'un droit."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-10",
+      "volet": "RGPD",
+      "etape": "Les personnes au cœur du traitement",
+      "question": "Les droits des personnes sont-ils respectés et les mesures pour leur application sont-elles implémentées ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "L'information des utilisateurs vise à assurer la transparence sur la collecte et le traitement des données. L'information préalable facilite l'exercice éclairé des droits.\n\nLe Chapitre III du RGPD regroupe l'ensemble de ces droits : l'accès, la rectification, l'effacement, la limitation, la portabilité et l'opposition au traitement de leurs données personnelles.",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre3",
+      "mesures": {
+        "resume": "Distinguer information et exercice des droits, vérifier la transparence et permettre l'isolement ou la suppression des données sur demande.",
+        "operatoire": [
+          "Distinguer visuellement l'information et les droits sur l'interface utilisateur avec des onglets différents.",
+          "Prévoir un affichage différencié selon le type de SIA (ex : chatbot avec message automatique).",
+          "S'assurer que l'utilisateur distingue information et droits (case à cocher, CGU).",
+          "Prévoir les allègements au droit à l'information (article 14.5 RGPD).",
+          "Informer sur : finalité, base légale, durée de conservation, modalités d'exercice des droits, évolutions du logiciel, dysfonctionnements."
+        ],
+        "detail": "Le droit à l'information doit comporter : la finalité, la base légale, la durée de conservation, le cadre d'accès aux données, les modalités d'exercice des droits. En cas d'utilisation ultérieure, d'évolution du logiciel ou de dysfonctionnements, l'utilisateur doit être informé."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-11",
+      "volet": "RGPD",
+      "etape": "Sécurisation des données",
+      "question": "Des mesures techniques et organisationnelles sont-elles prises pour garantir la sécurité des données ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "L'article 32 du RGPD impose de mettre en œuvre des mesures techniques et organisationnelles adaptées pour garantir la sécurité des données personnelles, en fonction du risque associé au traitement.\n\n→ Assurer le bon fonctionnement technique d'un SIA permet de prévenir des atteintes aux droits fondamentaux de la charte : la protection des données (article 8), droit à une bonne administration (article 41), droit à la non-discrimination (article 21).",
+      "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre4#Article32",
+      "mesures": {
+        "resume": "Signaler les violations à la CNIL dans les 72h et évaluer le niveau de sécurité des données personnelles.",
+        "operatoire": [
+          "Mettre en place un protocole d'action automatique selon la gravité, la vraisemblance et le profil de l'attaquant.",
+          "Simuler des attaques régulièrement avec REX et formations ciblées.",
+          "Séparer techniquement les fonctionnalités (API différentes, bases de données distinctes).",
+          "Prévoir une procédure de sauvegarde et récupération des données.",
+          "Établir un niveau de garantie élevé pour l'utilisateur (CAPTCHA, watermarking, profils distincts)."
+        ],
+        "detail": "Le protocole doit s'activer automatiquement selon la gravité, la vraisemblance et la généralisation de l'attaque. Utiliser la checklist CNIL pour évaluer le niveau de sécurité : https://www.cnil.fr/sites/cnil/files/2024-03/guide_securite_donnees_personnelles_checklist.pdf"
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RGPD-12",
+      "volet": "RGPD",
+      "etape": "Sécurisation des données",
+      "question": "Les données personnelles peuvent-elles être anonymisées ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "Il peut convenir, selon les cas d'usages, d'anonymiser les données pour éviter de façon certaine tout traitement de données personnelles ultérieur pour cause d'un problème technique ou d'une ré-identification par croisement de données.",
+      "lien": "https://www.cnil.fr/fr/technologies/lanonymisation-de-donnees-personnelles",
+      "mesures": {
+        "resume": "Mettre en place un processus d'anonymisation, effectuer des tests de robustesse et prévoir au minimum une pseudonymisation.",
+        "operatoire": [
+          "Sélection des données pertinentes et définition de la granularité.",
+          "Anonymisation par randomisation ou par généralisation.",
+          "Documenter les données anonymisées pour justifier des mesures prises.",
+          "Tester la robustesse de l'anonymisation et le risque de ré-identification.",
+          "Déterminer des intervalles de test pour préserver le caractère anonyme.",
+          "Si l'anonymisation n'est pas possible, prévoir au moins une pseudonymisation documentée."
+        ],
+        "detail": "L'anonymisation peut se faire par randomisation (modifier les attributs) ou par généralisation (modifier l'échelle des attributs). Des tests réguliers de ré-identification doivent être menés pour vérifier la robustesse dans le temps."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RIA-02",
+      "volet": "IA Act",
+      "etape": "Définition du SIA",
+      "question": "Le système d'IA est-il à risque limité ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "Les SIA à risque limité sont l'ensemble des systèmes qui peuvent interagir avec une personne (chatbots), les systèmes d'IA générative ou qui manipulent du contenu.\n\nSon impact négatif se mesure au regard du degré de confiance que place l'utilisateur dans l'IA visée.",
+      "lien": "https://artificialintelligenceact.eu/fr/chapter/5/",
+      "mesures": {
+        "resume": "Distinguer les obligations de transparence RGPD et RIA, et inscrire le système dans la base de données de l'UE.",
+        "operatoire": [
+          "Distinguer les mesures de transparence issues du RGPD (finalités, durées de conservation) et celles du RIA.",
+          "Prévoir différents onglets selon l'obligation de transparence et des documents distincts.",
+          "Pour la base de données de l'UE : suivre la procédure d'enregistrement prévue par l'article 71 du RIA."
+        ],
+        "detail": "Le RGPD oblige à informer les personnes sur les finalités et durées de conservation. Le RIA ajoute des obligations de transparence spécifiques. Les deux doivent être distinguées sur l'interface utilisateur."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2025-08-02"
+    },
+    {
+      "id": "RIA-03",
+      "volet": "IA Act",
+      "etape": "Définition du SIA",
+      "question": "Le système d'IA présente-t-il un risque systémique ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "Si l'IA présente un risque systémique, le RIA impose des obligations afin de garantir un niveau adéquat de sécurité pour les droits, la sécurité et la santé des personnes physiques.\n\nQue le modèle soit autonome ou qu'il soit intégré dans un système d'IA, les règles s'appliquent.",
+      "lien": "https://artificialintelligenceact.eu/fr/chapter/5/",
+      "mesures": {
+        "resume": "Vérifier si l'IA présente un risque systémique et, le cas échéant, atténuer ces risques.",
+        "operatoire": [
+          "Mener une étude préalable sur la qualification de risque systémique.",
+          "Réaliser l'évaluation du modèle avec des tests contradictoires.",
+          "Documenter les essais contradictoires internes et externes.",
+          "Signaler les incidents graves à l'Office AI et aux autorités nationales.",
+          "Mettre en place des processus de gouvernance et de coopération UE.",
+          "Inscrire le système dans la base de données de l'UE (article 71 RIA).",
+          "Appliquer les mesures techniques de cybersécurité."
+        ],
+        "detail": "Il n'y a pas de risque significatif si le système exécute une tâche procédurale étroite, améliore le résultat d'une activité humaine déjà réalisée, ou détecte des écarts par rapport à des schémas antérieurs sans remplacer l'évaluation humaine."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": false,
+        "test": false,
+        "production": false,
+        "exploitation": false
+      },
+      "date_entree_vigueur": "2025-08-02"
+    },
+    {
+      "id": "RIA-04",
+      "volet": "IA Act",
+      "etape": "Définition du SIA",
+      "question": "Le Système d'IA est-il considéré « à haut risque » ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "L'article 6 du RIA définit les Systèmes d'IA à haut risque et précise les critères (portée sur la santé, sécurité ou droits fondamentaux) avec des listes d'usages en annexes III.\n\nAttention : si votre système effectue le profilage de personnes physiques, il est toujours considéré comme présentant un risque élevé.",
+      "lien": "https://artificialintelligenceact.eu/fr/section/3-1/",
+      "mesures": {
+        "resume": "La catégorisation « IA à haut risque » impose des exigences de conformité renforcées.",
+        "operatoire": [
+          "Exigences de conformité renforcées en termes de sécurité, confidentialité et protection des données.",
+          "Analyse d'impact sur les droits fondamentaux (article 27 du RIA).",
+          "Gestion des risques rigoureuse incluant identification, évaluation et mitigation.",
+          "Essais et tests rigoureux de conformité.",
+          "Surveillance et maintenance continues.",
+          "Formation et sensibilisation des utilisateurs.",
+          "Documentation et traçabilité des décisions.",
+          "Conformité aux normes applicables.",
+          "Évaluation et certification par des organismes tiers.",
+          "Responsabilité et accountability du déployeur."
+        ],
+        "detail": "Les systèmes d'IA à haut risque sont soumis à des exigences renforcées couvrant la conformité, l'analyse d'impact sur les droits fondamentaux, la gestion des risques, les tests, la surveillance, la formation, la documentation et la certification."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2026-08-02"
+    },
+    {
+      "id": "RIA-05",
+      "volet": "IA Act",
+      "etape": "Définition du SIA",
+      "question": "Les démarches administratives imposées par le RIA ont-elles été réalisées ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "La section V du RIA liste les documents à fournir afin de se mettre en conformité avec le RIA (notamment pour les IA à haut risque).",
+      "lien": "https://artificialintelligenceact.eu/fr/section/3-5/",
+      "mesures": {
+        "resume": "Réaliser les démarches administratives : déclaration de conformité, certificats, marquage CE, enregistrement UE.",
+        "operatoire": [
+          "Rédiger la déclaration de conformité UE (annexe V du RIA).",
+          "Obtenir les certificats requis (durée de validité 4-5 ans).",
+          "Apposer le marquage CE de manière visible, lisible et indélébile.",
+          "Enregistrer le SIA dans la base de données de l'UE (fiche descriptive, PIA, contacts).",
+          "Mettre en place la notification des incidents graves (dans les 15 jours).",
+          "Pour les SIA à risque limité : mesures de déclaration de conformité, traçabilité, transparence, contrôle humain."
+        ],
+        "detail": "Article 44 RIA : Certificats (validité 4-5 ans). Article 47 : Déclaration de conformité. Article 48 : Marquage CE. Article 49 : Enregistrement base de données UE. Article 73 : Notification des incidents graves."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": false,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2026-08-02"
+    },
+    {
+      "id": "RIA-06",
+      "volet": "IA Act",
+      "etape": "Autonomie du SIA",
+      "question": "Le SIA utilise-t-il des données d'utilisation pour améliorer son fonctionnement (auto-optimisation après déploiement) ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "L'apprentissage continu permet aux modèles de s'adapter en permanence à de nouvelles données. Le SIA sera plus flexible, évolutif et personnalisé.\n\nL'Annexe XIII du RIA classe ces SIA. Selon le niveau d'autonomie ils peuvent présenter un risque systémique.\n\n→ Encadrer cette optimisation est une étape clé afin d'éviter toutes dérives du modèle.",
+      "lien": "https://artificialintelligenceact.eu/fr/annex/13/",
+      "mesures": {
+        "resume": "Garantir la maîtrise humaine du SIA et encadrer l'apprentissage continu.",
+        "operatoire": [
+          "Validation par un agent humain pour toute optimisation importante (fixer des seuils de contrôle).",
+          "Offrir aux utilisateurs un choix quant à l'utilisation de leurs données (opt-out).",
+          "Implémenter des purges automatiques plus régulières pour les données d'optimisation.",
+          "Séparer les finalités : traiter l'apprentissage continu comme un traitement distinct.",
+          "Prévoir des modes d'apprentissage différenciés (dysfonctionnement, retour utilisateur, nouvelle collecte).",
+          "Vérifier l'échantillonnage des données d'amélioration pour éviter les discriminations.",
+          "Mettre en place un système de validation croisée des données."
+        ],
+        "detail": "L'IA doit pouvoir s'améliorer en cas de dysfonctionnement ou de retour utilisateur négatif. Documenter le fine-tuning : prompt engineering, LoRA, RAG. Définir les hyperparamètres (taux d'apprentissage, nombre d'itérations, taille du lot)."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2025-08-02"
+    },
+    {
+      "id": "RIA-07",
+      "volet": "IA Act",
+      "etape": "Autonomie du SIA",
+      "question": "Le système d'IA embarque-t-il des règles d'auto-limitation ou de conditionnement pour éviter les usages abusifs ou détournés ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "L'auto-limitation suppose que le SIA est en capacité :\n→ d'informer l'utilisateur qu'il n'a pas la réponse à la question posée ;\n→ qu'il ne peut pas aller au-delà de ce pourquoi il est programmé.",
+      "lien": "",
+      "mesures": {
+        "resume": "Prendre des mesures proactives pour garantir la sécurité, la robustesse et la résilience du système.",
+        "operatoire": [
+          "Concevoir des solutions techniques qui préviennent les comportements préjudiciables.",
+          "Prévoir des mesures de sécurité après défaillance (interruption sécurisée).",
+          "Garantir la résilience face aux comportements préjudiciables ou indésirables.",
+          "Mettre en place des mesures de cybersécurité robustes."
+        ],
+        "detail": "Le système doit pouvoir interrompre son fonctionnement en toute sécurité en cas d'anomalie ou de fonctionnement en dehors de certaines limites déterminées au préalable."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "RIA-08",
+      "volet": "IA Act",
+      "etape": "Mesures organisationnelles pour une conformité au RIA",
+      "question": "Des garanties de transparence sont-elles prévues, notamment pour les SIA à risque limité ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "L'article 13 du RIA prévoit une obligation de transparence pour tous les SIA. Elle permet de comprendre le rôle et le fonctionnement de l'IA et d'informer l'utilisateur final qu'il utilise une IA.\n\nC'est la principale exigence pour les SIA à risque limité. Elle est reprise par l'article L. 311-3-1 du Code des relations entre le public et l'administration.\n\nCes obligations ne s'appliquent pas si l'usage du SIA est autorisé par la loi pour détecter, prévenir ou poursuivre une infraction pénale.",
+      "lien": "https://artificialintelligenceact.eu/fr/article/13/",
+      "mesures": {
+        "resume": "Établir une liste des cas nécessitant une mesure de transparence et informer l'utilisateur.",
+        "operatoire": [
+          "Tenir à jour un répertoire communicable des SIA classés par niveau de risque.",
+          "Prévoir un message clair dès le premier contact : « vous interagissez avec une IA ».",
+          "Ajouter un lien « en savoir plus » détaillant les fonctionnalités du SIA.",
+          "Informer les personnes si une mémorisation de l'IA est possible.",
+          "Tester ce que le SIA a pu mémoriser et publier les résultats.",
+          "S'appuyer sur les codes de pratique (article 56 RIA) si pertinent."
+        ],
+        "detail": "La documentation technique doit inclure les informations de l'annexe XII du RIA, être conservée et mise à jour pour toute évolution substantielle, et être synthétique et compréhensible pour l'usager."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2025-08-02"
+    },
+    {
+      "id": "RIA-09",
+      "volet": "IA Act",
+      "etape": "Mesures organisationnelles pour une conformité au RIA",
+      "question": "Un suivi de la conformité au Règlement IA est-il prévu ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "La conformité est un processus continu qui s'adapte aux évolutions technologiques et réglementaires.\n\nMême si un SIA à haut risque fait l'objet d'une première démarche de mise en conformité, une seconde s'impose pour toute évolution importante « substantielle » du système conformément à l'article 43.4 du RIA.",
+      "lien": "https://artificialintelligenceact.eu/fr/section/3-2/",
+      "mesures": {
+        "resume": "Mettre en place un système de gestion des risques, une gouvernance et des audits réguliers.",
+        "operatoire": [
+          "Instaurer une gouvernance minimale avec réévaluation périodique des risques.",
+          "Vérifier annuellement l'AIPD et les mesures en place.",
+          "Qualifier et documenter les « modifications substantielles ».",
+          "Faire une veille sur les avancées technologiques et menaces.",
+          "Mettre à jour le système (patchs de sécurité, nouvelles versions).",
+          "Institutionnaliser un cycle d'amélioration continue.",
+          "Organiser des ateliers collaboratifs de retour d'expérience."
+        ],
+        "detail": "Le suivi doit inclure des indicateurs clés (KPI), des audits réguliers, une grille technique des mesures selon le type de modifications substantielles, et une boucle de rétroaction pour l'amélioration continue."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": false,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2025-08-02"
+    },
+    {
+      "id": "RIA-10",
+      "volet": "IA Act",
+      "etape": "Place de l'humain dans l'usage du SIA",
+      "question": "Une intervention humaine est-elle garantie ?",
+      "type": "oui_non",
+      "criticite": "important",
+      "contexte": "L'article 22 du RGPD interdit de prendre une décision fondée exclusivement sur un traitement automatisé ayant des effets juridiques affectant de manière significative la personne.\n\nL'article 14 du RIA prévoit une supervision humaine :\n- Human-in-the-Loop : l'agent intervient dans le processus décisionnel et prend la décision finale\n- Human-on-the-Loop : l'agent supervise en temps réel et intervient en cas d'alerte\n- Human-in-Command : superviser la gouvernance des données",
+      "lien": "https://artificialintelligenceact.eu/fr/article/14/",
+      "mesures": {
+        "resume": "Garantir l'intervention humaine et prévoir la possibilité de recours.",
+        "operatoire": [
+          "Validation par un agent humain pour toute optimisation importante.",
+          "Fixer des seuils au-dessus desquels une intervention humaine s'impose.",
+          "Désigner expressément les personnes en charge des décisions.",
+          "Définir le degré d'intervention (human in command, on-the-loop, in-the-loop).",
+          "Justifier chaque décision prise par l'agent humain pour éviter les biais.",
+          "Prévoir un recours pour les administrés (article L312-3 CRPA).",
+          "Conserver le code source en cas de litige."
+        ],
+        "detail": "En cas de décision ayant un impact sur l'attribution de droits ou sur une décision RH, privilégier le human-in-the-loop. L'opérateur doit justifier ses décisions pour éviter le biais d'automatisation (accorder trop de confiance au SIA)."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2025-08-02"
+    },
+    {
+      "id": "RIA-11",
+      "volet": "IA Act",
+      "etape": "Démarches administratives, éthiques et environnementales",
+      "question": "L'éthique fait-elle partie intégrante du SIA ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "Le chapitre 10 du RIA prévoit la rédaction de lignes directrices et codes de conduite.\n\nL'éthique fait de l'IA un outil au service de l'humain et de l'intérêt général :\n1. Elle assure un usage légitime, transparent et responsable de l'IA.\n2. Elle assure le respect des droits fondamentaux et l'équité des décisions.\n3. Elle renforce la confiance du public et encadre l'action des agents.\n4. Elle assure la souveraineté technologique de l'État.",
+      "lien": "https://artificialintelligenceact.eu/fr/chapter/10/",
+      "mesures": {
+        "resume": "Utiliser le SIA dans l'intérêt général, respecter les droits fondamentaux et appliquer les 7 principes éthiques.",
+        "operatoire": [
+          "Maximiser le bénéfice du SIA pour la société avec des objectifs clairs et indicateurs de performance.",
+          "Faire intervenir l'ensemble des parties prenantes (administration, universités, syndicats).",
+          "Favoriser le respect de la Charte des droits fondamentaux (art. 8, 21, 34, 41).",
+          "Appliquer les 7 principes éthiques (intervention humaine, robustesse, vie privée, bien-être sociétal, transparence, diversité, non-discrimination).",
+          "S'aligner sur la stratégie nationale pour l'IA.",
+          "Intégrer dès la conception une conformité technique, juridique et sociétale."
+        ],
+        "detail": "Les 7 principes non contraignants du considérant 27 du RIA : intervention humaine et surveillance, robustesse technique et sécurité, protection de la vie privée, bien-être sociétal et environnemental, transparence, diversité, non-discrimination et équité."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "AFNOR-01",
+      "volet": "AFNOR SPEC / RGESN",
+      "etape": "Démarches administratives, éthiques et environnementales",
+      "question": "Des mesures de frugalité sont-elles prises pour éviter un usage abusif et une finalité disproportionnée de l'IA ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "Dans le cadre du cycle de vie de la donnée, la notion de frugalité de l'IA s'interprète « by design ».\n\nLe référentiel AFNOR définit la frugalité comme : « l'aptitude à se contenter d'un niveau de résultat jugé suffisant en redéfinissant les usages et les besoins ».\n\nPar « usage abusif » : tout besoin accessoire ou occasionnel, non fondamental ni durable.\nPar « finalité disproportionnée » : toute solution d'IA mise en œuvre automatiquement et dont la pertinence n'a pas été évaluée.",
+      "lien": "https://agirpourlatransition.ademe.fr/particuliers/conso/conso-responsable/connaissez-vous-votre-empreinte-climat",
+      "mesures": {
+        "resume": "Vérifier l'utilité du service, l'absence de solution existante équivalente, la durabilité et la sobriété dans l'utilisation des données.",
+        "operatoire": [
+          "Vérifier l'utilité du service vs les bénéfices attendus et dresser un arbre des conséquences.",
+          "Vérifier qu'aucune solution équivalente n'existe déjà (benchmark).",
+          "Vérifier la durabilité du service sur le long terme.",
+          "Intégrer la sobriété dans l'utilisation des données personnelles.",
+          "Privilégier les données existantes et limiter la collecte de nouvelles données.",
+          "Prévoir des caches serveurs et un partage via API."
+        ],
+        "detail": "L'utilité du service peut s'évaluer selon : les 17 ODD de l'ONU, les 9 limites planétaires, la Taxonomie européenne, la directive CSRD, la norme ISO 26000, le Global Reporting Initiative."
+      },
+      "applicable": {
+        "cadrage": true,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "AFNOR-02",
+      "volet": "AFNOR SPEC / RGESN",
+      "etape": "Démarches administratives, éthiques et environnementales",
+      "question": "Des mesures pour maîtriser/encadrer le réentraînement sont-elles prises afin de limiter les impacts environnementaux ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "L'entraînement d'une IA peut engendrer une grande consommation d'énergie et de ressources. L'objectif est d'évaluer la nécessité d'un réentraînement pour éviter une consommation énergétique inutile et un surentraînement.\n\nLe réentraînement s'entend comme tout nouveau jeu de données qui permet d'affiner le modèle, ainsi que l'optimisation du SIA, l'intégration de nouveaux paramètres.",
+      "lien": "https://agirpourlatransition.ademe.fr/particuliers/conso/conso-responsable/connaissez-vous-votre-empreinte-climat",
+      "mesures": {
+        "resume": "Optimiser le fonctionnement de l'IA avec des critères de performance et encadrer le réentraînement.",
+        "operatoire": [
+          "Optimiser le fonctionnement en intégrant des critères de performance et qualité.",
+          "Définir une fréquence de réentraînement évaluée selon des critères objectifs.",
+          "Restreindre les mises à jour trop régulières ou trop coûteuses pour l'environnement.",
+          "Privilégier un modèle pré-entraîné avec fine-tuning si possible.",
+          "Identifier des KPI : précision, généralisation, efficacité, interprétabilité, évolutivité, temps de réponse.",
+          "Documenter les phases de test dans une déclaration d'éco-conception."
+        ],
+        "detail": "Définir des métriques de consommation CPU/GPU/TPU en corrélation avec des métriques de qualité. Si possible, remplacer les entraînements de deep learning par des techniques de régression ou réseaux de neurones simples."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      }
+    },
+    {
+      "id": "TRANS-01",
+      "volet": "IA Act / AFNOR SPEC / RGESN",
+      "etape": "Démarches administratives, éthiques et environnementales",
+      "question": "Les agents sont-ils régulièrement sensibilisés aux enjeux juridiques, éthiques et environnementaux ?",
+      "type": "oui_non",
+      "criticite": "recommande",
+      "contexte": "Le déploiement de l'IA au sein de l'administration touche l'ensemble de ses agents.\n\nL'article 4 du RIA dispose que tout agent devra acquérir la connaissance nécessaire pour prendre des décisions éclairées pendant toutes les phases du cycle de vie d'une IA.\n\nL'article 10 du RIA souligne l'existence de biais :\n- « Biais d'ancrage » : influence trop importante du SIA avec priorité à la première impression\n- « Biais d'automatisation » : confiance excessive dans la décision proposée par le SIA\n- Mauvaise lecture/interprétation des résultats de l'IA",
+      "lien": "https://artificialintelligenceact.eu/fr/article/4/",
+      "mesures": {
+        "resume": "Mettre en place des formations obligatoires, une politique interne et des RACI.",
+        "operatoire": [
+          "Mettre en place des formations obligatoires et maintenir à jour les connaissances.",
+          "Rédiger une politique interne pour le déploiement du SIA.",
+          "Définir des RACI pour les personnes impliquées à chaque étape du cycle de vie.",
+          "Favoriser le recrutement de personnes qualifiées sur ces questions.",
+          "Sensibiliser à l'impact environnemental (mutualisation, échelonnage des calculs, stockage responsable)."
+        ],
+        "detail": "Avant tout usage du SIA, un questionnaire de connaissance peut conditionner l'accès. La politique interne doit être décidée collégialement et diffusée sous forme de bonnes pratiques et chartes. Les formations doivent être dégradées selon les métiers avec des sachants généralistes et spécialisés."
+      },
+      "applicable": {
+        "cadrage": false,
+        "developpement": true,
+        "test": true,
+        "production": true,
+        "exploitation": true
+      },
+      "date_entree_vigueur": "2025-02-02"
+    }
+  ]
+}
