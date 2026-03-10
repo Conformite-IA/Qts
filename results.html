@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="system">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Résultats — Questionnaire de satisfaction</title>
+  <link rel="stylesheet" href="./assets/dsfr.min.css" />
+  <link rel="stylesheet" href="./assets/icons.min.css" />
+  <style>
+    .maxw{max-width:64rem}
+    .kpi-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem}
+    .kpi-box{flex:1;min-width:12rem;padding:1.25rem;border:1px solid #ddd;border-radius:.75rem;background:#fff}
+    .kpi-label{font-size:.82rem;color:#666;margin-bottom:.25rem}
+    .kpi-value{font-size:2rem;font-weight:800;line-height:1.2}
+    .kpi-sub{font-size:.78rem;color:#888;margin-top:.15rem}
+
+    .section-card{background:#fff;border:1px solid #e5e5e5;border-radius:.75rem;padding:1.5rem;margin-bottom:1.5rem}
+    .section-title{font-size:1.15rem;font-weight:700;color:#000091;margin:0 0 1.25rem}
+
+    .q-result{margin-bottom:2rem}
+    .q-result:last-child{margin-bottom:0}
+    .q-result-label{font-weight:600;margin-bottom:.1rem;line-height:1.4}
+    .q-result-num{color:#000091;margin-right:.35rem}
+    .q-result-meta{font-size:.82rem;color:#888;margin-bottom:.65rem}
+
+    /* Bar chart */
+    .bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+    .bar-label{min-width:11rem;font-size:.85rem;text-align:right;color:#333;flex-shrink:0}
+    .bar-track{flex:1;height:1.4rem;background:#f0f0f0;border-radius:.25rem;overflow:hidden;position:relative}
+    .bar-fill{height:100%;border-radius:.25rem;transition:width .5s}
+    .bar-count{min-width:5rem;font-size:.82rem;color:#555}
+    .bar-fill.c5{background:#18753c}.bar-fill.c4{background:#27a658}.bar-fill.c3{background:#b8860b}.bar-fill.c2{background:#e4794a}.bar-fill.c1{background:#ce0500}
+    .bar-fill.default{background:#000091}
+    .bar-fill.det{background:#ce0500}.bar-fill.pas{background:#b34000}.bar-fill.pro{background:#18753c}
+
+    /* NPS gauge */
+    .nps-gauge{display:flex;height:2rem;border-radius:.35rem;overflow:hidden;margin-bottom:.5rem}
+    .nps-gauge>div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.78rem;font-weight:600;transition:width .5s}
+    .nps-gauge .det{background:#ce0500}.nps-gauge .pas{background:#b34000}.nps-gauge .pro{background:#18753c}
+    .nps-legend{display:flex;gap:1.5rem;font-size:.82rem;color:#555;flex-wrap:wrap}
+    .nps-legend span::before{content:'';display:inline-block;width:.7rem;height:.7rem;border-radius:50%;margin-right:.3rem;vertical-align:middle}
+    .nps-legend .l-det::before{background:#ce0500}.nps-legend .l-pas::before{background:#b34000}.nps-legend .l-pro::before{background:#18753c}
+
+    /* Verbatims */
+    .verb-list{list-style:none;padding:0;margin:0}
+    .verb-list li{padding:.65rem .75rem;border-bottom:1px solid #f0f0f0;font-size:.9rem;line-height:1.45}
+    .verb-list li:last-child{border-bottom:none}
+    .verb-list .verb-date{font-size:.75rem;color:#999;margin-right:.5rem}
+
+    /* Table */
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:.5rem;border-bottom:1px solid #eee;text-align:left;font-size:.88rem}
+    th{font-weight:600;color:#555;font-size:.82rem}
+    .pill{display:inline-block;padding:.1rem .5rem;border-radius:999px;border:1px solid #ddd;font-size:.78rem}
+
+    .actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem}
+    .empty-state{text-align:center;padding:3rem 1rem;color:#888}
+    .empty-state p{font-size:1.1rem;margin-bottom:1rem}
+
+    .toast{position:fixed;bottom:2rem;right:2rem;z-index:9999;padding:1rem 1.5rem;border-radius:.5rem;background:#000091;color:#fff;font-weight:600;opacity:0;transform:translateY(1rem);transition:opacity .3s,transform .3s;pointer-events:none}
+    .toast.show{opacity:1;transform:translateY(0)}
+
+    @media(max-width:40rem){.bar-label{min-width:7rem;font-size:.78rem}}
+  </style>
+</head>
+<body>
+
+<header class="fr-header" role="banner">
+  <div class="fr-header__body">
+    <div class="fr-container maxw">
+      <div class="fr-header__brand">
+        <div class="fr-header__brand-top">
+          <div class="fr-header__logo"><p class="fr-logo">République<br>Française</p></div>
+        </div>
+        <div class="fr-header__service">
+          <p class="fr-header__service-title">Résultats — Satisfaction</p>
+          <p class="fr-header__service-tagline" style="opacity:.8">Questionnaire de conformité IA (DGFIP)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="fr-header__menu">
+    <div class="fr-container maxw">
+      <nav class="fr-nav" role="navigation" aria-label="Navigation">
+        <ul class="fr-nav__list">
+          <li class="fr-nav__item"><a class="fr-nav__link" href="./satisfactions.html">Remplir le questionnaire</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="fr-container fr-py-4w maxw" role="main">
+  <h1 class="fr-h3">Tableau de bord des résultats</h1>
+  <p class="fr-text--lg fr-mb-3w">Les réponses soumises apparaissent automatiquement. Aucun import nécessaire.</p>
+  <div id="dashboard"></div>
+</main>
+
+<footer class="fr-footer" role="contentinfo">
+  <div class="fr-container maxw">
+    <div class="fr-footer__body">
+      <div class="fr-footer__brand"><p class="fr-logo">République<br>Française</p></div>
+      <div class="fr-footer__content"><p class="fr-footer__content-desc">Usage interne — aucune collecte serveur.</p></div>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+(function(){
+
+var STORE_KEY = 'satisfaction_responses';
+var dashboard = document.getElementById('dashboard');
+var toastEl = document.getElementById('toast');
+var toastTimer = null;
+
+var LIKERT_LABELS = {5:'Tout à fait d\'accord',4:'Plutôt d\'accord',3:'Neutre',2:'Plutôt pas d\'accord',1:'Pas du tout d\'accord'};
+var PERTINENCE_OPTIONS = ['Très pertinent','Plutôt pertinent','Peu pertinent','Pas pertinent','Non concerné'];
+
+var SECTIONS = [
+  {id:'profil',title:'Profil & contexte'},
+  {id:'qualite',title:'Qualité du contenu et de la structure'},
+  {id:'pertinence',title:'Pertinence selon la phase du cycle de vie'},
+  {id:'amelioration',title:'Adaptation au besoin et pistes d\'amélioration'}
+];
+
+var QUESTIONS = [
+  {id:'q1',num:1,section:'profil',label:'Quel est votre profil principal ?',type:'radio',
+   options:['Développeur','Chef de projet','Juriste / DPO','SSI / RSSI','Data (PO/DS/DE)'],allowOther:true},
+  {id:'q2',num:2,section:'profil',label:'Votre niveau de familiarité (IA / RGPD / conformité) ?',type:'radio',
+   options:['Débutant','Intermédiaire','Avancé / Expert']},
+  {id:'q3',num:3,section:'profil',label:'Temps total estimé pour compléter le questionnaire',type:'radio',
+   options:['< 15 min','15–30 min','30–60 min','> 60 min']},
+  {id:'q4',num:4,section:'qualite',label:'Le niveau de langage est compréhensible quel que soit le profil',type:'likert'},
+  {id:'q5',num:5,section:'qualite',label:'Les mesures correctives proposées sont concrètes et actionnables',type:'likert'},
+  {id:'q6',num:6,section:'qualite',label:'La structuration (volets / étapes) est logique et facile à suivre',type:'likert'},
+  {id:'q7',num:7,section:'pertinence',label:'Cadrage / Conception',type:'pertinence'},
+  {id:'q8',num:8,section:'pertinence',label:'Développement / Intégration',type:'pertinence'},
+  {id:'q9',num:9,section:'pertinence',label:'Test / Validation',type:'pertinence'},
+  {id:'q10',num:10,section:'pertinence',label:'Production',type:'pertinence'},
+  {id:'q11',num:11,section:'pertinence',label:'Exploitation / Amélioration',type:'pertinence'},
+  {id:'q12',num:12,section:'amelioration',label:'Pour votre profil, le questionnaire répond au besoin (sans être trop lourd)',type:'likert'},
+  {id:'q13',num:13,section:'amelioration',label:'Quelle(s) thématique(s) faudrait-il approfondir en priorité ?',type:'checkbox',
+   options:['RGPD (bases légales, personnes concernées, droits)','IA Act (classification, pratiques interdites, obligations)',
+   'Sécurité / SSI (mesures techniques, accès, traçabilité)','Qualité des données / tests (biais, robustesse, validation)',
+   'Documentation / preuves (dossier de conformité, audit)','Place de l\'humain / supervision (HITL)',
+   'Éthique / environnement (RGESN, sobriété)'],allowOther:true},
+  {id:'q14',num:14,section:'amelioration',label:'Quels sont les manques / ambiguïtés prioritaires ?',type:'textarea'},
+  {id:'q15',num:15,section:'amelioration',label:'Recommanderiez-vous ce questionnaire ?',type:'nps'}
+];
+
+function esc(s){var d=document.createElement('div');d.textContent=String(s==null?'':s);return d.innerHTML;}
+
+function toast(msg){
+  clearTimeout(toastTimer);
+  toastEl.textContent=msg;toastEl.className='toast show';
+  toastTimer=setTimeout(function(){toastEl.classList.remove('show');},3000);
+}
+
+function getResponses(){
+  try{var r=localStorage.getItem(STORE_KEY);return r?JSON.parse(r):[];}catch(e){return [];}
+}
+
+/* ── Helpers ── */
+
+function mean(nums){if(!nums.length)return null;return nums.reduce(function(a,b){return a+b;},0)/nums.length;}
+function round1(x){return Math.round(x*10)/10;}
+
+function countMap(arr){
+  var m={};arr.forEach(function(v){var k=v||'(vide)';m[k]=(m[k]||0)+1;});return m;
+}
+
+function countMapArray(arrs){
+  var m={};arrs.forEach(function(list){
+    (list&&list.length?list:['(vide)']).forEach(function(v){m[v]=(m[v]||0)+1;});
+  });return m;
+}
+
+/* ── Bar chart HTML ── */
+
+function barChart(counts,orderedKeys,total,colorFn){
+  if(!total)return '<p style="color:#999;font-size:.88rem">Aucune réponse.</p>';
+  var h='';
+  orderedKeys.forEach(function(k){
+    var n=counts[k]||0;
+    var pct=Math.round((n/total)*100);
+    var cls=colorFn?colorFn(k):'default';
+    h+='<div class="bar-row">';
+    h+='<div class="bar-label">'+esc(k)+'</div>';
+    h+='<div class="bar-track"><div class="bar-fill '+cls+'" style="width:'+pct+'%"></div></div>';
+    h+='<div class="bar-count">'+n+' ('+pct+'%)</div>';
+    h+='</div>';
+  });
+  return h;
+}
+
+function likertColor(k){return 'c'+k;}
+function pertinenceColor(k){
+  if(k==='Très pertinent')return 'c5';if(k==='Plutôt pertinent')return 'c4';
+  if(k==='Peu pertinent')return 'c2';if(k==='Pas pertinent')return 'c1';return 'default';
+}
+
+/* ── Render per-question results ── */
+
+function renderRadioResult(q,responses){
+  var vals=responses.map(function(r){return r.answers[q.id]||'';}).filter(Boolean);
+  if(q.allowOther){
+    responses.forEach(function(r){
+      var a=r.answers[q.id+'_autre'];
+      if(a&&!r.answers[q.id])vals.push('Autre: '+a);
+    });
+  }
+  var counts=countMap(vals);
+  var keys=q.options.slice();
+  Object.keys(counts).forEach(function(k){if(keys.indexOf(k)===-1)keys.push(k);});
+  var total=vals.length;
+  var h='<div class="q-result">';
+  h+='<div class="q-result-label"><span class="q-result-num">Q'+q.num+'</span> '+esc(q.label)+'</div>';
+  h+='<div class="q-result-meta">'+total+' réponse(s)</div>';
+  h+=barChart(counts,keys,total);
+  h+='</div>';
+  return h;
+}
+
+function renderLikertResult(q,responses){
+  var nums=responses.map(function(r){return parseInt(r.answers[q.id],10);}).filter(function(n){return !isNaN(n);});
+  var counts=countMap(nums.map(String));
+  var keys=['5','4','3','2','1'];
+  var total=nums.length;
+  var avg=mean(nums);
+  var h='<div class="q-result">';
+  h+='<div class="q-result-label"><span class="q-result-num">Q'+q.num+'</span> '+esc(q.label)+'</div>';
+  h+='<div class="q-result-meta">'+total+' réponse(s)'+(avg!==null?' — Moyenne : <strong>'+round1(avg)+' / 5</strong>':'')+'</div>';
+  var labels={'5':'5 – Tout à fait','4':'4 – Plutôt','3':'3 – Neutre','2':'2 – Plutôt pas','1':'1 – Pas du tout'};
+  var labelled={};keys.forEach(function(k){labelled[labels[k]]=counts[k]||0;});
+  h+=barChart(labelled,Object.keys(labelled),total,function(k){return 'c'+k.charAt(0);});
+  h+='</div>';
+  return h;
+}
+
+function renderPertinenceResult(q,responses){
+  var vals=responses.map(function(r){return r.answers[q.id]||'';}).filter(Boolean);
+  var counts=countMap(vals);
+  var total=vals.length;
+  var h='<div class="q-result">';
+  h+='<div class="q-result-label"><span class="q-result-num">Q'+q.num+'</span> '+esc(q.label)+'</div>';
+  h+='<div class="q-result-meta">'+total+' réponse(s)</div>';
+  h+=barChart(counts,PERTINENCE_OPTIONS,total,pertinenceColor);
+  h+='</div>';
+  return h;
+}
+
+function renderCheckboxResult(q,responses){
+  var arrs=responses.map(function(r){return r.answers[q.id]||[];});
+  var counts=countMapArray(arrs);
+  var keys=q.options.slice();
+  Object.keys(counts).forEach(function(k){if(keys.indexOf(k)===-1&&k!=='(vide)')keys.push(k);});
+  var total=responses.length;
+  var h='<div class="q-result">';
+  h+='<div class="q-result-label"><span class="q-result-num">Q'+q.num+'</span> '+esc(q.label)+'</div>';
+  h+='<div class="q-result-meta">Nombre de fois sélectionné (sur '+total+' répondant(s))</div>';
+  h+=barChart(counts,keys,total);
+  h+='</div>';
+  return h;
+}
+
+function renderTextareaResult(q,responses){
+  var items=responses.map(function(r){return {text:r.answers[q.id]||'',date:r.submitted_at||''};}).filter(function(x){return x.text;});
+  var h='<div class="q-result">';
+  h+='<div class="q-result-label"><span class="q-result-num">Q'+q.num+'</span> '+esc(q.label)+'</div>';
+  h+='<div class="q-result-meta">'+items.length+' verbatim(s)</div>';
+  if(!items.length){
+    h+='<p style="color:#999;font-size:.88rem">Aucun commentaire.</p>';
+  } else {
+    h+='<ul class="verb-list">';
+    items.forEach(function(it){
+      var d=it.date?it.date.slice(0,10):'';
+      h+='<li><span class="verb-date">'+esc(d)+'</span>'+esc(it.text)+'</li>';
+    });
+    h+='</ul>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function renderNpsResult(q,responses){
+  var nums=responses.map(function(r){return parseInt(r.answers[q.id],10);}).filter(function(n){return !isNaN(n)&&n>=0&&n<=10;});
+  var total=nums.length;
+  var avg=mean(nums);
+  var det=nums.filter(function(n){return n<=6;}).length;
+  var pas=nums.filter(function(n){return n>=7&&n<=8;}).length;
+  var pro=nums.filter(function(n){return n>=9;}).length;
+  var nps=total?Math.round(((pro/total)*100)-((det/total)*100)):null;
+
+  var h='<div class="q-result">';
+  h+='<div class="q-result-label"><span class="q-result-num">Q'+q.num+'</span> '+esc(q.label)+'</div>';
+  h+='<div class="q-result-meta">'+total+' réponse(s)'+(avg!==null?' — Moyenne : <strong>'+round1(avg)+' / 10</strong>':'');
+  if(nps!==null) h+=' — NPS : <strong>'+nps+'</strong>';
+  h+='</div>';
+
+  if(total){
+    var pDet=Math.round((det/total)*100);
+    var pPas=Math.round((pas/total)*100);
+    var pPro=Math.round((pro/total)*100);
+    h+='<div class="nps-gauge">';
+    if(pDet)h+='<div class="det" style="width:'+pDet+'%">'+det+'</div>';
+    if(pPas)h+='<div class="pas" style="width:'+pPas+'%">'+pas+'</div>';
+    if(pPro)h+='<div class="pro" style="width:'+pPro+'%">'+pro+'</div>';
+    h+='</div>';
+    h+='<div class="nps-legend"><span class="l-det">Détracteurs (0–6) : '+det+'</span><span class="l-pas">Passifs (7–8) : '+pas+'</span><span class="l-pro">Promoteurs (9–10) : '+pro+'</span></div>';
+  }
+
+  var counts={};for(var i=0;i<=10;i++)counts[String(i)]=0;
+  nums.forEach(function(n){counts[String(n)]++;});
+  var keys=[];for(var j=0;j<=10;j++)keys.push(String(j));
+  h+='<div style="margin-top:1rem">';
+  h+=barChart(counts,keys,total,function(k){var n=parseInt(k,10);return n<=6?'det':n<=8?'pas':'pro';});
+  h+='</div>';
+
+  h+='</div>';
+  return h;
+}
+
+/* ── KPIs ── */
+
+function renderKPIs(responses){
+  var total=responses.length;
+  var likertQs=['q4','q5','q6','q12'];
+  var sats=responses.map(function(r){
+    var nums=likertQs.map(function(k){return parseInt(r.answers[k],10);}).filter(function(n){return !isNaN(n);});
+    return nums.length?mean(nums):null;
+  }).filter(function(v){return v!==null;});
+  var satAvg=mean(sats);
+
+  var npsNums=responses.map(function(r){return parseInt(r.answers.q15,10);}).filter(function(n){return !isNaN(n)&&n>=0&&n<=10;});
+  var npsAvg=mean(npsNums);
+  var det=npsNums.filter(function(n){return n<=6;}).length;
+  var pro=npsNums.filter(function(n){return n>=9;}).length;
+  var nps=npsNums.length?Math.round(((pro/npsNums.length)*100)-((det/npsNums.length)*100)):null;
+
+  var h='<div class="kpi-row">';
+  h+='<div class="kpi-box"><div class="kpi-label">Réponses</div><div class="kpi-value">'+total+'</div></div>';
+  h+='<div class="kpi-box"><div class="kpi-label">Satisfaction moyenne</div><div class="kpi-value">'+(satAvg!==null?round1(satAvg).toFixed(1)+' <span style="font-size:.9rem;font-weight:400">/ 5</span>':'—')+'</div><div class="kpi-sub">Q4, Q5, Q6, Q12</div></div>';
+  h+='<div class="kpi-box"><div class="kpi-label">Recommandation moyenne</div><div class="kpi-value">'+(npsAvg!==null?round1(npsAvg).toFixed(1)+' <span style="font-size:.9rem;font-weight:400">/ 10</span>':'—')+'</div></div>';
+  h+='<div class="kpi-box"><div class="kpi-label">NPS</div><div class="kpi-value">'+(nps!==null?nps:'—')+'</div><div class="kpi-sub">9–10 promoteurs, 0–6 détracteurs</div></div>';
+  h+='</div>';
+  return h;
+}
+
+/* ── Raw table ── */
+
+function renderTable(responses){
+  var h='<div class="section-card"><div class="section-title">Données brutes</div>';
+  h+='<div class="table-wrap"><table><thead><tr>';
+  h+='<th>Date</th><th>Profil</th><th>Niveau</th><th>Satisfaction</th><th>Reco</th>';
+  h+='</tr></thead><tbody>';
+
+  var likertQs=['q4','q5','q6','q12'];
+  responses.forEach(function(r){
+    var a=r.answers;
+    var nums=likertQs.map(function(k){return parseInt(a[k],10);}).filter(function(n){return !isNaN(n);});
+    var sat=nums.length?round1(mean(nums)).toFixed(1):'—';
+    var reco=a.q15!==''&&a.q15!=null?a.q15:'—';
+    var profil=a.q1||(a.q1_autre?'Autre: '+a.q1_autre:'')||'—';
+    var date=(r.submitted_at||'').slice(0,16).replace('T',' ');
+    h+='<tr><td>'+esc(date)+'</td><td>'+esc(profil)+'</td><td>'+esc(a.q2||'—')+'</td><td>'+esc(sat)+'</td><td>'+esc(reco)+'</td></tr>';
+  });
+
+  h+='</tbody></table></div></div>';
+  return h;
+}
+
+/* ── Export ── */
+
+function csvEscape(s){return String(s==null?'':s).replace(/"/g,'""');}
+
+function exportCSV(responses){
+  var likertQs=['q4','q5','q6','q12'];
+  var headers=['date','profil','niveau','temps','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','sat_moyenne','nps'];
+  var sep=';';var bom='\uFEFF';
+  var lines=[headers.map(function(h){return '"'+h+'"';}).join(sep)];
+  responses.forEach(function(r){
+    var a=r.answers;
+    var profil=a.q1||(a.q1_autre?'Autre: '+a.q1_autre:'')||'';
+    var nums=likertQs.map(function(k){return parseInt(a[k],10);}).filter(function(n){return !isNaN(n);});
+    var sat=nums.length?round1(mean(nums)).toFixed(2):'';
+    var row=[r.submitted_at||'',profil,a.q2||'',a.q3||'',a.q4||'',a.q5||'',a.q6||'',a.q7||'',a.q8||'',a.q9||'',a.q10||'',a.q11||'',a.q12||'',(a.q13||[]).join(' | '),a.q14||'',a.q15||'',sat,a.q15||''];
+    lines.push(row.map(function(v){return '"'+csvEscape(v)+'"';}).join(sep));
+  });
+  var blob=new Blob([bom+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='satisfaction_resultats.csv';document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove();},0);
+  toast('CSV exporté');
+}
+
+/* ── Render dashboard ── */
+
+function render(){
+  var responses=getResponses();
+
+  if(!responses.length){
+    dashboard.innerHTML='<div class="empty-state"><p>Aucune réponse enregistrée.</p><a class="fr-btn" href="./satisfactions.html">Remplir le questionnaire</a></div>';
+    return;
+  }
+
+  var html='';
+  html+=renderKPIs(responses);
+
+  SECTIONS.forEach(function(sec){
+    var qs=QUESTIONS.filter(function(q){return q.section===sec.id;});
+    html+='<div class="section-card">';
+    html+='<div class="section-title">'+esc(sec.title)+'</div>';
+    qs.forEach(function(q){
+      if(q.type==='radio') html+=renderRadioResult(q,responses);
+      else if(q.type==='likert') html+=renderLikertResult(q,responses);
+      else if(q.type==='pertinence') html+=renderPertinenceResult(q,responses);
+      else if(q.type==='checkbox') html+=renderCheckboxResult(q,responses);
+      else if(q.type==='textarea') html+=renderTextareaResult(q,responses);
+      else if(q.type==='nps') html+=renderNpsResult(q,responses);
+    });
+    html+='</div>';
+  });
+
+  html+=renderTable(responses);
+
+  html+='<div class="actions">';
+  html+='<button class="fr-btn fr-btn--secondary" type="button" id="btnExportCsv">Exporter CSV</button>';
+  html+='<button class="fr-btn fr-btn--tertiary" type="button" id="btnClear">Supprimer toutes les réponses</button>';
+  html+='</div>';
+
+  dashboard.innerHTML=html;
+
+  document.getElementById('btnExportCsv').addEventListener('click',function(){exportCSV(responses);});
+  document.getElementById('btnClear').addEventListener('click',function(){
+    if(!confirm('Supprimer définitivement toutes les réponses ?'))return;
+    localStorage.removeItem(STORE_KEY);
+    render();
+    toast('Réponses supprimées');
+  });
+}
+
+window.addEventListener('focus',render);
+render();
+
+})();
+</script>
+</body>
+</html>
