@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="system">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Synthèse des questionnaires de conformité IA complétés — DGFIP">
+  <title>Synthèse des résultats — Questionnaire de conformité IA — DGFIP</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.12.1/dist/dsfr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.12.1/dist/utility/icons/icons.min.css">
+  <style>
+    .criticite-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .criticite-bloquant { background-color: #CE0500; }
+    .criticite-important { background-color: #B34000; }
+    .criticite-recommande { background-color: #695240; }
+    .criticite-facultatif { background-color: #666666; }
+    .statut-conforme { color: #18753C; font-weight: 700; }
+    .statut-non-conforme { color: #CE0500; font-weight: 700; }
+    .statut-na { color: #929292; }
+    .detail-table { font-size: 0.875rem; }
+    .detail-table td { vertical-align: top; padding: 0.35rem 0.5rem; }
+    .synthese-empty { text-align: center; padding: 3rem 1rem; color: #666; }
+    .fr-collapse { max-height: 0; overflow: hidden; transition: max-height 0.25s ease-out; }
+    .fr-collapse.fr-collapse--expanded { max-height: 9999px; }
+  </style>
+</head>
+<body>
+  <header role="banner" class="fr-header">
+    <div class="fr-header__body">
+      <div class="fr-container">
+        <div class="fr-header__body-row">
+          <div class="fr-header__brand fr-enlarge-link">
+            <div class="fr-header__brand-top">
+              <div class="fr-header__logo">
+                <p class="fr-logo">République<br>Française</p>
+              </div>
+            </div>
+            <div class="fr-header__service">
+              <a href="index.html" title="Retour au questionnaire">
+                <p class="fr-header__service-title">Questionnaire de conformité IA</p>
+              </a>
+              <p class="fr-header__service-tagline">Synthèse des résultats — DGFIP</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main role="main" id="main-content" class="fr-container fr-my-4w" tabindex="-1">
+    <h1 class="fr-h2">Synthèse des questionnaires complétés</h1>
+    <p class="fr-text--sm fr-mb-3w">Les bilans terminés sont enregistrés localement dans votre navigateur. Cette page affiche l’historique des évaluations.</p>
+
+    <div class="fr-mb-3w">
+      <a href="index.html" class="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-arrow-left-line">Retour au questionnaire</a>
+    </div>
+
+    <div id="synthese-list"></div>
+    <div id="synthese-empty" class="synthese-empty fr-hidden">
+      <p class="fr-text--lg">Aucun questionnaire complété pour le moment.</p>
+      <p class="fr-text--sm fr-mt-1w">Complétez une évaluation sur la <a href="index.html">page du questionnaire</a> pour voir les résultats apparaître ici.</p>
+    </div>
+  </main>
+
+  <footer class="fr-footer" role="contentinfo">
+    <div class="fr-container">
+      <div class="fr-footer__body">
+        <p class="fr-footer__content-desc">Application de conformité IA — DGFIP. Données stockées localement dans votre navigateur.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  'use strict';
+  (function() {
+    var SYNTHESE_STORAGE_KEY = 'questionnaire-ia-synthese';
+
+    function escapeHtml(str) {
+      if (str == null) return '';
+      var s = String(str);
+      return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function getCriticiteLabel(c) {
+      var map = { bloquant: 'Bloquant', important: 'Important', recommande: 'Recommandé', facultatif: 'Facultatif' };
+      return map[c] || c;
+    }
+
+    function getStatutLabel(s) {
+      var map = { conforme: 'Conforme', non_conforme: 'Non conforme', na: 'Non applicable' };
+      return map[s] || s;
+    }
+
+    function getStatutClass(s) {
+      if (s === 'conforme') return 'statut-conforme';
+      if (s === 'non_conforme') return 'statut-non-conforme';
+      return 'statut-na';
+    }
+
+    function formatDate(iso) {
+      try {
+        return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        return iso || '—';
+      }
+    }
+
+    function renderDetail(resultats) {
+      if (!resultats || !resultats.length) return '';
+      var html = '<table class="fr-table fr-table--bordered detail-table"><thead><tr><th scope="col">Question</th><th scope="col">Réponse</th><th scope="col">Statut</th><th scope="col">Criticité</th></tr></thead><tbody>';
+      resultats.forEach(function(r) {
+        html += '<tr>';
+        html += '<td>' + escapeHtml(r.question) + '</td>';
+        html += '<td>' + escapeHtml(r.reponse || '—') + '</td>';
+        html += '<td><span class="' + getStatutClass(r.statut) + '">' + escapeHtml(getStatutLabel(r.statut)) + '</span></td>';
+        html += '<td><span class="criticite-badge criticite-' + escapeHtml(r.criticite || '') + '">' + escapeHtml(getCriticiteLabel(r.criticite)) + '</span></td>';
+        html += '</tr>';
+        if (r.statut === 'non_conforme' && r.mesures_resume) {
+          html += '<tr><td colspan="4" style="font-size:0.8rem;color:#666;padding-left:1.5rem">→ ' + escapeHtml(r.mesures_resume) + '</td></tr>';
+        }
+      });
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function loadAndRender() {
+      var list = [];
+      try {
+        var raw = localStorage.getItem(SYNTHESE_STORAGE_KEY);
+        if (raw) list = JSON.parse(raw);
+        if (!Array.isArray(list)) list = [];
+      } catch (e) {
+        list = [];
+      }
+
+      var container = document.getElementById('synthese-list');
+      var emptyEl = document.getElementById('synthese-empty');
+
+      if (list.length === 0) {
+        container.innerHTML = '';
+        emptyEl.classList.remove('fr-hidden');
+        return;
+      }
+
+      emptyEl.classList.add('fr-hidden');
+      var html = '';
+
+      list.forEach(function(entry, index) {
+        var meta = entry.meta || {};
+        var score = entry.score || {};
+        var pct = score.globalPourcent != null ? score.globalPourcent : 0;
+        var completedAt = formatDate(entry.completedAt || meta.exportDate);
+
+        html += '<section class="fr-accordion fr-mb-2w">';
+        html += '  <h2 class="fr-accordion__title">';
+        html += '    <button type="button" class="fr-accordion__btn" aria-expanded="false" aria-controls="synthese-' + index + '" id="accordion-' + index + '-btn">';
+        html += '      <span class="fr-accordion__title-inner">';
+        html += '        <strong>' + escapeHtml(meta.projet || 'Sans nom') + '</strong>';
+        html += '        — ' + escapeHtml(meta.date || '') + ' — Score : ' + pct + '%';
+        html += '        <span class="fr-text--sm" style="color:#666"> (complété le ' + completedAt + ')</span>';
+        html += '      </span>';
+        html += '    </button>';
+        html += '  </h2>';
+        html += '  <div class="fr-collapse" id="synthese-' + index + '" aria-labelledby="accordion-' + index + '-btn">';
+        html += '    <div class="fr-accordion__inner">';
+        html += '      <div class="fr-mb-2w">';
+        html += '        <p class="fr-text--sm"><strong>Phases :</strong> ' + escapeHtml(Array.isArray(meta.phases) ? meta.phases.join(', ') : (meta.phases || '—')) + '</p>';
+        html += '        <p class="fr-text--sm"><strong>Résumé :</strong> ' + (score.conforme || 0) + ' conforme(s), ' + (score.nonConforme || 0) + ' non conforme(s), ' + (score.nonApplicable || 0) + ' N/A</p>';
+        html += '      </div>';
+        html += '      <h3 class="fr-h5 fr-mb-1w">Détail des réponses</h3>';
+        html += renderDetail(entry.resultats);
+        html += '    </div>';
+        html += '  </div>';
+        html += '</section>';
+      });
+
+      container.innerHTML = html;
+
+      // Accordion behavior (DSFR uses data-fr-js-accordion, we can use native details or simple toggle)
+      container.querySelectorAll('.fr-accordion__btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var id = this.getAttribute('aria-controls');
+          var panel = document.getElementById(id);
+          if (!panel) return;
+          var expanded = this.getAttribute('aria-expanded') === 'true';
+          this.setAttribute('aria-expanded', !expanded);
+          panel.classList.toggle('fr-collapse--expanded', !expanded);
+        });
+      });
+    }
+
+    loadAndRender();
+  })();
+  </script>
+</body>
+</html>
