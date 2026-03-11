@@ -70,7 +70,7 @@
     </div>
     <div id="synthese-error" class="synthese-empty fr-hidden">
       <p class="fr-text--lg">Impossible de charger les résultats.</p>
-      <p class="fr-text--sm fr-mt-1w">Sur un hébergement statique (ex. GitHub Pages), les résultats sont enregistrés dans ce navigateur uniquement. Complétez un questionnaire depuis cette même machine pour les voir ici.</p>
+      <p class="fr-text--sm fr-mt-1w">Vérifiez que le serveur est démarré et que le fichier <code>resultats.json</code> est accessible.</p>
     </div>
   </main>
 
@@ -199,8 +199,6 @@
       });
     }
 
-    var SYNTHESE_STORAGE_KEY = 'questionnaire-ia-synthese';
-
     function loadAndRender() {
       var loadingEl = document.getElementById('synthese-loading');
       var errorEl = document.getElementById('synthese-error');
@@ -212,17 +210,7 @@
       emptyEl.classList.add('fr-hidden');
       errorEl.classList.add('fr-hidden');
 
-      function tryLocalStorage() {
-        var list = [];
-        try {
-          var raw = localStorage.getItem(SYNTHESE_STORAGE_KEY);
-          if (raw) list = JSON.parse(raw);
-          if (!Array.isArray(list)) list = [];
-        } catch (e) { list = []; }
-        return list;
-      }
-
-      fetch('resultats.json')
+      fetch('api/resultats.json')
         .then(function(res) {
           if (!res.ok) throw new Error('Fichier inaccessible');
           return res.json();
@@ -232,15 +220,8 @@
           renderList(list);
         })
         .catch(function() {
-          var list = tryLocalStorage();
-          if (list.length > 0) {
-            renderList(list);
-            loadingEl.classList.add('fr-hidden');
-            container.insertAdjacentHTML('afterbegin', '<p class="fr-alert fr-alert--info fr-mb-2w" role="status">Données chargées depuis ce navigateur (hébergement statique sans serveur PHP).</p>');
-          } else {
-            loadingEl.classList.add('fr-hidden');
-            errorEl.classList.remove('fr-hidden');
-          }
+          loadingEl.classList.add('fr-hidden');
+          errorEl.classList.remove('fr-hidden');
         });
     }
 
