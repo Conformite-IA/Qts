@@ -197,7 +197,7 @@
     {
       "id": "RGPD-07",
       "volet": "RGPD",
-      "question": "Des mesures juridiques sont-elles prises en cas de traitement de donnnées sensibles ou biométriques ?",
+      "question": "Des mesures juridiques sont-elles prises en cas de traitement de données sensibles ou biométriques ?",
       "contexte": "Une donnée sensible ou  biométrique est <b>intransèque à la personne concernée. </b>Dès lors, des mesures approriées et une démarche rigoureuse s'imposent.",
       "etape": "Etape : Nature des données traitées",
       "lien": "https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre1#Article4",
