@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-scheme="system">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Questionnaire de conformité réglementaire pour les systèmes d'intelligence artificielle — DGFIP">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com; img-src 'self' data: blob:;">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="Referrer-Policy" content="no-referrer">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+  <title>Questionnaire de conformité IA — DGFIP</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.12.1/dist/dsfr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.12.1/dist/utility/icons/icons.min.css">
+  <style>
+    :root {
+      --volet-ia-act: #000091;
+      --volet-rgpd: #CE614A;
+      --volet-afnor: #18753C;
+      --volet-transverse: #695240;
+      --criticite-bloquant: #CE0500;
+      --criticite-important: #B34000;
+      --criticite-recommande: #695240;
+      --criticite-facultatif: #666666;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      font-family: 'Marianne', arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--background-default-grey, #fff);
+      color: var(--text-default-grey, #161616);
+    }
+
+    .app-main { flex: 1; }
+
+    /* Accessibility */
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    *:focus-visible {
+      outline: 2px solid var(--volet-ia-act);
+      outline-offset: 2px;
+    }
+
+    /* Badges */
+    .volet-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 0.25rem;
+      color: #fff;
+      font-size: 0.875rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .volet-ia-act { background-color: var(--volet-ia-act); }
+    .volet-rgpd { background-color: var(--volet-rgpd); }
+    .volet-afnor { background-color: var(--volet-afnor); }
+    .volet-transverse { background-color: var(--volet-transverse); }
+
+    .criticite-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    .criticite-bloquant { background-color: var(--criticite-bloquant); }
+    .criticite-important { background-color: var(--criticite-important); }
+    .criticite-recommande { background-color: var(--criticite-recommande); }
+    .criticite-facultatif { background-color: var(--criticite-facultatif); }
+
+    /* Progress */
+    .progress-container { margin: 1rem 0; }
+    .progress-bar-track {
+      width: 100%;
+      background: #e5e5e5;
+      border-radius: 0.25rem;
+      height: 0.5rem;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--volet-ia-act);
+      border-radius: 0.25rem;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      min-width: 0;
+    }
+
+    /* Question card */
+    .question-card {
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .question-card.stopped {
+      border-color: var(--criticite-bloquant);
+      border-width: 2px;
+    }
+
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .btn-response {
+      min-width: 120px;
+    }
+    .btn-response[aria-pressed="true"] {
+      box-shadow: inset 0 0 0 2px currentColor;
+    }
+
+    /* Summary panel */
+    .summary-panel {
+      background: #f6f6f6;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      position: sticky;
+      top: 1rem;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .summary-item:last-child { border-bottom: none; }
+
+    /* Gauge */
+    .gauge-container { text-align: center; margin: 1.5rem 0; }
+    .gauge-svg { width: 140px; height: 140px; }
+    .gauge-bg { fill: none; stroke: #e5e5e5; stroke-width: 10; }
+    .gauge-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease, stroke 0.3s ease; }
+    .gauge-text { font-size: 1.75rem; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: var(--text-default-grey, #161616); }
+
+    /* Screens */
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Wizard */
+    .wizard-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #ddd;
+    }
+    .wizard-nav--card { border-top: none; padding-top: 0; }
+
+    /* Mesures */
+    .mesures-box {
+      background: #f5f5fe;
+      border-left: 4px solid var(--volet-ia-act);
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.25rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+
+    .stop-banner {
+      background: #fef0ef;
+      border: 2px solid var(--criticite-bloquant);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Audit mode */
+    .audit-question {
+      border: 1px solid #ddd;
+      border-radius: 0.5rem;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 0.75rem;
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+    .audit-question:focus-within {
+      border-color: var(--volet-ia-act);
+    }
+    .audit-response {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      margin-top: 0.75rem;
+    }
+    .audit-skipped { opacity: 0.5; }
+
+    /* Bilan */
+    .bilan-dashboard {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+      align-items: start;
+    }
+    .bilan-gauge-card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 0.75rem;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .bilan-gauge-card .gauge-svg { width: 180px; height: 180px; }
+    .bilan-gauge-card .gauge-text { font-size: 2.25rem; }
+    .bilan-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .bilan-meta-card {
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 0.5rem;
+      padding: 1rem 1.25rem;
+    }
+    .bilan-meta-card dt { font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.25rem; }
+    .bilan-meta-card dd { margin: 0; font-size: 1rem; font-weight: 700; }
+    .bilan-kpi-row {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 1rem;
+    }
+    .bilan-kpi {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid #e5e5e5;
+      background: #fff;
+    }
+    .bilan-kpi-value { font-size: 1.75rem; font-weight: 700; display: block; }
+    .bilan-kpi-label { font-size: 0.75rem; color: #666; }
+
+    .bilan-volet { margin-bottom: 2rem; }
+    .bilan-volet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .bilan-volet-pct { font-size: 1.25rem; font-weight: 700; }
+    .bilan-bar {
+      display: flex;
+      height: 0.75rem;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      margin: 0.5rem 0 0.75rem;
+      background: #e5e5e5;
+    }
+    .bilan-bar > div { transition: width 0.4s ease; }
+    .bilan-bar-conforme { background: #18753C; }
+    .bilan-bar-non-conforme { background: #CE0500; }
+    .bilan-bar-na { background: #929292; }
+    .bilan-legend {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    .bilan-legend span::before {
+      content: '';
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      margin-right: 0.35rem;
+      vertical-align: middle;
+    }
+    .bilan-legend .leg-c::before { background: #18753C; }
+    .bilan-legend .leg-nc::before { background: #CE0500; }
+    .bilan-legend .leg-na::before { background: #929292; }
+
+    .bilan-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .bilan-table th { text-align: left; padding: 0.6rem 0.75rem; background: #f6f6f6; border-bottom: 2px solid #ddd; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; color: #666; }
+    .bilan-table td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #eee; vertical-align: top; }
+    .bilan-table tr:last-child td { border-bottom: none; }
+    .bilan-status { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
+    .bilan-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+    .action-item {
+      padding: 1.25rem 1.5rem;
+      margin: 0.75rem 0;
+      border-radius: 0.5rem;
+      border-left: 4px solid;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .action-bloquant { border-color: var(--criticite-bloquant); background: #fef0ef; }
+    .action-important { border-color: var(--criticite-important); background: #fef4f0; }
+    .action-recommande { border-color: var(--criticite-recommande); background: #f5f2ef; }
+    .action-facultatif { border-color: var(--criticite-facultatif); background: #f5f5f5; }
+    .action-number { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #000091; color: #fff; font-size: 0.75rem; font-weight: 700; margin-right: 0.5rem; flex-shrink: 0; }
+
+    @media (max-width: 768px) {
+      .bilan-dashboard { grid-template-columns: 1fr; }
+      .bilan-meta-grid { grid-template-columns: 1fr; }
+      .bilan-kpi-row { flex-direction: column; }
+    }
+
+    /* Tabs */
+    .tab-list {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 1.5rem;
+    }
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-btn:hover { color: var(--volet-ia-act); }
+    .tab-btn[aria-selected="true"] {
+      color: var(--volet-ia-act);
+      border-bottom-color: var(--volet-ia-act);
+    }
+
+    /* Full-width content: description and questionnaire use full container width */
+    .app-main { max-width: 90rem; margin-left: auto; margin-right: auto; }
+    .screen--full-width > .fr-callout,
+    .screen .callout-full-width { width: 100%; max-width: none; }
+
+    .accueil-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.5rem; color: var(--text-default-grey, #161616); }
+    .accueil-description { margin: 0; font-size: 1rem; line-height: 1.5; color: var(--text-default-grey, #161616); }
+
+    #group-phase.fr-input-group--error .fr-select { border-color: var(--criticite-bloquant, #CE0500); box-shadow: inset 0 0 0 2px var(--criticite-bloquant, #CE0500); }
+
+
+    /* Responsive */
+    .layout-row {
+      display: flex;
+      gap: 2rem;
+    }
+    .layout-main { flex: 1; min-width: 0; }
+    .layout-aside { width: 320px; flex-shrink: 0; }
+
+    @media (max-width: 991px) {
+      .layout-row { flex-direction: column; }
+      .layout-aside { width: 100%; }
+      .summary-panel { position: static; }
+    }
+    @media (max-width: 576px) {
+      .question-card { padding: 1.25rem; }
+      .btn-response { min-width: 90px; }
+    }
+
+    /* Print */
+    @media print {
+      .no-print { display: none !important; }
+      .screen { display: block !important; }
+      body { background: #fff; }
+      .question-card, .audit-question, .action-item { break-inside: avoid; }
+    }
+
+    /* Details/summary styling */
+    details { margin-top: 0.75rem; }
+    details summary {
+      cursor: pointer;
+      color: var(--volet-ia-act);
+      font-weight: 600;
+      padding: 0.25rem 0;
+    }
+    details summary:hover { text-decoration: underline; }
+    details[open] > summary { margin-bottom: 0.5rem; }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #18753C;
+      color: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { background: var(--criticite-bloquant); }
+  </style>
+</head>
+<body>
+  <!-- Skip links - RGAA 12.7 -->
+  <div class="fr-skiplinks">
+    <nav class="fr-container" role="navigation" aria-label="Accès rapide">
+      <ul class="fr-skiplinks__list">
+        <li><a class="fr-link" href="#main-content">Contenu principal</a></li>
+        <li><a class="fr-link" href="#summary-panel">Synthèse de conformité</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Header DSFR - RGAA 12.6 -->
+  <header role="banner" class="fr-header">
+    <div class="fr-header__body">
+      <div class="fr-container">
+        <div class="fr-header__body-row">
+          <div class="fr-header__brand fr-enlarge-link">
+            <div class="fr-header__brand-top">
+              <div class="fr-header__logo">
+                <p class="fr-logo">République<br>Française</p>
+              </div>
+            </div>
+            <div class="fr-header__service">
+              <a href="index.html" title="Accueil — Questionnaire de conformité IA">
+                <p class="fr-header__service-title">Questionnaire de conformité IA</p>
+              </a>
+              <p class="fr-header__service-tagline">Auto-évaluation réglementaire pour les systèmes d'IA — DGFIP</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main role="main" id="main-content" class="fr-container fr-my-4w app-main" tabindex="-1">
+
+    <!-- ======================= SCREEN: ACCUEIL ======================= -->
+    <section id="screen-accueil" class="screen active screen--full-width" aria-label="Écran d'accueil">
+      <div class="accueil-intro callout-full-width fr-mb-4w">
+        <h1 class="accueil-title">Évaluation de conformité IA</h1>
+        <p class="accueil-description">
+          Ce questionnaire a pour vocation de vous accompagner dans le cadre de la mise en conformité de votre Projet IA. A l'issue de la complétion du questionnaire, une "pré-analyse" juridique adaptée à l'état d'avancement de votre projet vous sera transmise. Cette dernière vous fournira les premières estimations du pourcentage de conformité de votre projet ainsi qu'une fiche récapitulative des mesures à adopter.
+        </p>
+        <p class="accueil-description fr-mt-2w">
+          Aussi, il est indispensable de valider l'utilité du projet IA. Il convient de vérifier&nbsp;:
+        </p>
+        <ul class="fr-mt-1w fr-pl-3w">
+          <li class="accueil-description"> Que la maturité du besoin est avérée</li>
+          <li class="accueil-description"> Qu'aucune solution existante n'est satisfaisante</li>
+          <li class="accueil-description"> Que le projet permettra de solutionner un problème déterminé (organisation, gestion du service, etc.)</li>
+          <li class="accueil-description"> Que les moyens mis en œuvre pour le déploiement de cette IA ne seront pas disproportionnés par rapport au résultat attendu</li>
+        </ul>
+      </div>
+
+      <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12">
+
+          <form id="form-accueil" aria-label="Paramètres du questionnaire" novalidate>
+            <h2 class="accueil-title fr-mb-2w" id="legend-projet">Informations du projet</h2>
+            <fieldset class="fr-fieldset" aria-labelledby="legend-projet">
+              <div class="fr-fieldset__element">
+                <div class="fr-input-group" id="group-projet">
+                  <label class="fr-label" for="input-projet">Nom du projet IA</label>
+                  <input class="fr-input" type="text" id="input-projet" name="projet"
+                         required aria-required="true" autocomplete="off" maxlength="200">
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="fr-fieldset fr-mt-3w" aria-labelledby="legend-phases" id="fieldset-phases">
+              <legend class="fr-sr-only" id="legend-phases">Phases du cycle de vie concernées</legend>
+              <div class="fr-fieldset__element fr-input-group" id="group-phase">
+                <label class="fr-label" for="select-phase">Phases du cycle de vie concernées</label>
+                <select class="fr-select" id="select-phase" name="phase" aria-label="Choisir une phase du cycle de vie">
+                  <option value="">Choisir une phase</option>
+                  <option value="cadrage">Cadrage / Conception</option>
+                  <option value="developpement">Développement / Intégration</option>
+                  <option value="test">Test / Validation</option>
+                  <option value="production">Production</option>
+                  <option value="exploitation">Exploitation / Amélioration</option>
+                </select>
+              </div>
+            </fieldset>
+
+            <div class="btn-group fr-mt-3w">
+              <button type="submit" class="fr-btn fr-btn--icon-right fr-icon-arrow-right-line" id="btn-commencer">
+                Commencer l'évaluation
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= SCREEN: QUESTIONNAIRE ======================= -->
+    <section id="screen-questionnaire" class="screen" aria-label="Questionnaire de conformité">
+
+      <!-- Tabs -->
+      <div class="no-print tab-list" role="tablist" aria-label="Mode d'affichage du questionnaire">
+        <button id="tab-wizard" class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-wizard" tabindex="0">
+          Mode assistant
+        </button>
+        <button id="tab-audit" class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-audit" tabindex="-1">
+          Mode audit
+        </button>
+      </div>
+
+      <div class="layout-row">
+        <!-- Main panel -->
+        <div class="layout-main">
+
+          <!-- Wizard panel -->
+          <div id="panel-wizard" role="tabpanel" aria-labelledby="tab-wizard">
+            <!-- Progress -->
+            <div id="wizard-header" class="fr-mb-2w">
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem">
+                <span id="wizard-step-label" class="fr-text--bold" aria-live="polite"></span>
+                <div id="wizard-volet-badge"></div>
+              </div>
+              <div class="progress-container">
+                <div class="progress-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progression du questionnaire" id="progress-bar">
+                  <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+                </div>
+                <p class="fr-text--xs fr-mt-1v" id="progress-text" aria-live="polite"></p>
+              </div>
+            </div>
+
+            <!-- Question container -->
+            <div id="wizard-question-container" aria-live="polite" aria-atomic="false"></div>
+
+            <!-- Navigation -->
+            <div id="wizard-nav" class="wizard-nav no-print"></div>
+          </div>
+
+          <!-- Audit panel -->
+          <div id="panel-audit" role="tabpanel" aria-labelledby="tab-audit" hidden>
+            <h2 class="fr-h4 fr-mb-2w">Vue audit — Toutes les questions</h2>
+            <div id="audit-container" aria-live="polite"></div>
+          </div>
+
+        </div>
+
+        <!-- Aside: Summary panel -->
+        <aside class="layout-aside no-print" id="summary-panel" aria-label="Synthèse de conformité en temps réel">
+          <div class="summary-panel">
+            <h2 class="fr-h5" id="summary-title">Synthèse</h2>
+
+            <div class="gauge-container" aria-label="Score de conformité global">
+              <svg class="gauge-svg" viewBox="0 0 140 140" aria-hidden="true">
+                <circle class="gauge-bg" cx="70" cy="70" r="60"></circle>
+                <circle class="gauge-fill" id="gauge-circle" cx="70" cy="70" r="60"
+                        stroke="#929292" stroke-dasharray="377" stroke-dashoffset="377"
+                        transform="rotate(-90 70 70)"></circle>
+                <text class="gauge-text" x="70" y="70" id="gauge-text">—</text>
+              </svg>
+              <p class="fr-text--sm fr-mt-1v" id="gauge-label" aria-live="polite">Aucune question répondue</p>
+            </div>
+
+            <div id="summary-details" aria-label="Détail par volet"></div>
+
+            <div class="fr-mt-2w">
+              <button class="fr-btn fr-btn--sm fr-btn--secondary" style="width:100%" id="btn-save-progress" type="button" aria-label="Sauvegarder la progression dans un fichier JSON">
+                <span class="fr-icon-save-line fr-icon--sm" aria-hidden="true"></span>
+                Sauvegarder
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ======================= SCREEN: BILAN ======================= -->
+    <section id="screen-bilan" class="screen" aria-label="Bilan de conformité">
+      <h1 class="fr-h2" tabindex="-1" id="bilan-titre">Bilan de conformité</h1>
+
+      <!-- Dashboard: gauge + metadata -->
+      <div class="bilan-dashboard" id="bilan-header" aria-label="Résumé du bilan">
+        <div class="bilan-gauge-card">
+          <svg class="gauge-svg" viewBox="0 0 140 140" aria-hidden="true">
+            <circle class="gauge-bg" cx="70" cy="70" r="60"></circle>
+            <circle class="gauge-fill" id="bilan-gauge-circle" cx="70" cy="70" r="60"
+                    stroke="#929292" stroke-dasharray="377" stroke-dashoffset="377"
+                    transform="rotate(-90 70 70)"></circle>
+            <text class="gauge-text" x="70" y="70" id="bilan-gauge-text">—</text>
+          </svg>
+          <p class="fr-text--sm fr-mt-1v" id="bilan-gauge-label">Score de conformité</p>
+        </div>
+        <div class="bilan-meta-grid" id="bilan-meta"></div>
+      </div>
+
+      <!-- Tabs: Synthèse / Plan d'action -->
+      <nav class="fr-tabs" role="tablist" aria-label="Sections du bilan">
+        <ul class="fr-tabs__list" role="tablist">
+          <li role="presentation"><button id="tab-synthese" class="fr-tabs__tab" role="tab" aria-selected="true" aria-controls="panel-synthese">Synthèse par volet</button></li>
+          <li role="presentation"><button id="tab-plan" class="fr-tabs__tab" role="tab" aria-selected="false" aria-controls="panel-plan">Plan d'action</button></li>
+        </ul>
+      </nav>
+
+      <div id="panel-synthese" role="tabpanel" aria-labelledby="tab-synthese">
+        <div id="bilan-content" aria-label="Détail par volet"></div>
+      </div>
+
+      <div id="panel-plan" role="tabpanel" aria-labelledby="tab-plan" hidden>
+        <div id="bilan-actions" aria-label="Liste des actions correctives"></div>
+      </div>
+
+      <div class="btn-group fr-mt-4w no-print">
+        <button class="fr-btn fr-btn--icon-left fr-icon-file-pdf-line" id="btn-export-pdf" type="button">Exporter en PDF</button>
+        <button class="fr-btn fr-btn--tertiary fr-btn--icon-left fr-icon-arrow-go-back-line" id="btn-retour-questionnaire" type="button">Revenir au questionnaire</button>
+        <button class="fr-btn fr-btn--tertiary-no-outline" id="btn-retour-accueil" type="button">Nouvelle évaluation</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer DSFR - RGAA 12.9 -->
+  <footer class="fr-footer" role="contentinfo" id="footer">
+    <div class="fr-container">
+      <div class="fr-footer__body">
+        <div class="fr-footer__brand fr-enlarge-link">
+          <p class="fr-logo">République<br>Française</p>
+        </div>
+        <div class="fr-footer__content">
+          <p class="fr-footer__content-desc">
+            Application de conformité IA — Direction Générale des Finances Publiques.<br>
+            Aucune donnée n'est transmise à un serveur. Toutes les données restent dans votre navigateur.
+          </p>
+          <ul class="fr-footer__content-list">
+            <li class="fr-footer__content-item">
+              <span class="fr-footer__content-link">Version du référentiel : <strong id="footer-version">—</strong></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="fr-footer__bottom">
+        <ul class="fr-footer__bottom-list">
+          <li class="fr-footer__bottom-item"><span class="fr-footer__bottom-link">Accessibilité : partiellement conforme (RGAA 4.1)</span></li>
+          <li class="fr-footer__bottom-item"><span class="fr-footer__bottom-link">Données personnelles : aucune collecte</span></li>
+          <li class="fr-footer__bottom-item"><span class="fr-footer__bottom-link">Cookies : aucun</span></li>
+          <li class="fr-footer__bottom-item"><span class="fr-footer__bottom-link">Sécurité : CSP, no-referrer, permissions-policy</span></li>
+        </ul>
+        <div class="fr-footer__bottom-copy">
+          <p>Sauf mention contraire, tous les contenus de ce site sont sous <a href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank" rel="noopener noreferrer">licence etalab-2.0</a></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- jsPDF for PDF export — fallback chain -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" crossorigin="anonymous"></script>
+  <script>
+    if (!window.jspdf) {
+      var s = document.createElement('script');
+      s.src = 'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js';
+      document.head.appendChild(s);
+    }
+  </script>
+
+  <script>
+  'use strict';
+  (function() {
+
+    // ============================================================
+    //  EMBEDDED DATA — Inline for offline / mono-file support
+    //  The app also tries to load from external JSON files first
+    // ============================================================
+
+    const EMBEDDED_REFERENTIEL = {"version":"2.0.0","date":"2026-03-10","questions":[{"id":"SIA-01","volet":"IA Act","question":"Je confirme que mon outil est un système d'IA (SIA)","contexte":"Un système d'IA s'entend comme : \n- Un système avec un certain degré d'autonomie ; \n- Un système capable de produire du contenu, faire des recommandations ou prendre des décisions ; \n- Un système qui est destiné à orienter ou  soutenir des décisions sur le plan organisationnel ou opérationnel.","etape":"Etape : définition du SIA","lien":"https://artificialintelligenceact.eu/fr/article/3/","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Le volet sur le règlement IA et RGPD ne s'appliquent pas à votre cas d'usage si les critères de définition du SIA ne sont pas remplis.","operatoire":[],"detail":"Mettre en oeuvre les recommandations RGPD qui vous ont été soumises."}},{"id":"RIA-01","volet":"IA Act","question":"Le système d'IA (ci-après : SIA) n'est concerné par aucune pratique interdite selon l'IA Act.","contexte":"Le Règlement sur l'IA prévoit que le système d'IA s'entend comme ayant<b> différents niveaux d'autonomie,</b> faisant <b>preuve d'adaptabilité </b>après son déploiement, et qui <b>génère des résultats</b> (prédictions,  contenu, des recommandations). \n\nL’article 5(*) de l’AI Act liste l'ensemble des pratiques interdites que sont notammment : \n→les <b>techniques de surveillance biométrique</b>, de <b>notation sociale</b>, de <b>manipulation subliminales</b> exploitant des vulnérabilités (liées à l’âge, au handicap ou à la situation sociale), ou toute technique susceptible de<b> causer un</b> <b>préjudice important </b>pour le droit des personnes","etape":"Etape : Point d'entrée","lien":"https://artificialintelligenceact.eu/fr/article/5/","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Adapter ou abandonner le projet pour éliminer la fonctionnalité interdite.","operatoire":[],"detail":"1. Adapter ou abandonner le projet pour éliminer la fonctionnalité interdite. Par ex : désactiver le module de reconnaissance émotionnelle de l’assistant intelligent, ou le restreindre à un usage autorisé. \n\n2.  Si un doute subsiste sur le caractère interdit, demander l’avis du DPO ou de la CNIL."}},{"id":"RGPD-01","volet":"RGPD","question":"J'atteste que le SIA ne traite aucune DP et que le modèle n'a jamais eu et n'aura jamais accès à des données personnelles.","contexte":"Une donnée personnelle correspond à toute information se rapportant à une personne physique identifiée ou identifiable. Les coordonnées d'entreprises (ex : mail générique, adresse de l'entreprise) ne sont pas des données personnelles au sens de la CNIL. \n\nUn traitement de données personnelles comprend :<b> la collecte, l'enregistrement, l'organisation, la conservation, la modification, l'extraction, la consultation, l'utilisation, la diffusion, l'effacement </b>permettant d'identifier directement ou indirectement une personne physique. \n\nA l'inverse les agents IA sans état (Stateless) sont des systèmes qui traitent chaque interaction indépendamment, sans mémoire des échanges passés.","etape":"Etape : Point d'entrée","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre1#Article4","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Vérifier le caractère identifiant et précis des données","operatoire":["Vérifier la présence de données rares, uniques ou minoritaires.","Vérifier le possible croisement d’un ensemble de données car le  risque de ré-identification n'est pas exclu."],"detail":"Vérifier le caractère identifiant et précis des données suppose que l'identification soit : \n -   une identification directe (exemple : nom et prénom) ;\n -   une identification indirecte (exemple : un numéro de téléphone, un numéro de sécurité sociale, une adresse postale, une image...).\n\nVérifier la présence de données dite <b>\"outliers\"</b>, abberantes ou rares. Elles sont uniques ou minoritaires et donc personnelles. Elles permettent à terme d'isoler une personne et donc de l'identifier.\n\nVérifier si le croisement d’un ensemble de données est possible. Si oui, elles sont personelles et le traitement permettra une identification indirecte (exemple : une femme vivant à telle adresse, née tel jour et membre de telle association). \n\nVérifier le type d'algorithme utilisé est le moins consommateur de données personnelles au regard de  l’objectif poursuivi"}},{"id":"RGPD-02","volet":"RGPD","question":"La finalité de mon traitement est déterminée, explicite et légitime","contexte":"La finalité est l<b>'objectif principal du traitement</b> des données. \n\nL’article 5.1 b RGPD (*) : la finalité doit être déterminée (dès la définition du projet), explicite ( connu et compréhensible) et légitime (compatible avec les missions de l’organisme).","etape":"Etape : Cadre général du RGPD","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Cadrer textuellement le projet pour l'utilisation et la réutilisation des données :","operatoire":["1. Rendre le projet clair et intelligible pour les personnes concernées","2. Dresser une liste des capacités du système d'IA qui peuvent être raisonnablement prévues","3. Prévoir les conditions d’utilisation du système d’IA (cas d’usage connus + modalités d’utilisation comme une diffusion en source ouverte, en SaaS....)"],"detail":"1. Cadrer le projet avant la collecte : \n     - Déterminer le but du fichier (objectif principal du traitement) <b>dès le commencement</b>. Exemple : si un SIA à un seul usage opérationnel, la finalité du traitement sera la même en phase de développement et de déploiement. \n     - Spécifier les finalités les plus à\" risque\" notamment (le type de donnée, les conséquences juridiques et financières...) dans le cadre de la  phase opérationnelle.\n       - Décrire les capacités du système : ses fonctionnalités (capacités technique ex : LLM pour le résumé, la correction de texte, la classification… ou modèle de vision pour détecter différents objets) mais aussi ses limites (classification que de certains  objets  détectés) \n        - Identifier les personnes suceptibles d'interagir avec l'IA (l'âge, le genre, les vulnérabilités dues à un handicap…)\n        - S'il y a une réutilisation de certaines données, la finalité doit être compatible avec la finalité initiale. \n\n2. Si le système est un GPAI :  \n      - ( Cartographier les cas usages et non pas seulement les données selon :  les finalités, le domaine , le destinataire du SIA, le modèle de LLM choisi pour le développement. \n      - Plusieurs finalités peuvent être déterminées dès lors qu’elles respectent l’article 5.1 \n\n3. Si il y a une réutilisation : \nS'assurer que la base de donnée objet de la réutilisation n'est manifestement pas illicite en procédant par un faiseau d'indice :\n- La source est connue et documentée afin de vrifier qu'elle n'a pas été constituée suite à une fuite ou vol, etc.\n- Ont bien été anonymisées les données sensibles ou d’infraction à la source. \n\n4. Responsabilisation (facultatif) : \n      - Signature d’une charte : le  projet s'engage à ne pas aller au delà de la destination du système d'IA\n      - Une empreinte numérique (nom, adresse IP) de la personne qui détournerait  un système d'IA de sa finalité"}},{"id":"RGPD-03","volet":"RGPD","question":"Une base légale valide a été identifiée (principe de licéité du traitement) ?","contexte":"La base légale correspond au<b> fondement juridique qui permet de rendre légitime le traitement </b>des données selon la finalité visée.\n\nPour une autorité publique, il s'agit le plus souvent  : \n- du  respect d'une<b> obligation légale </b>\n-  de l<b>'exécution d'une mission d'intérêt public</b> ou relevant de l'exercice de l'autorité publique\n- de l<b>'intérêt légitime</b> \n\nL’article 6 du RGPD (*) liste les six bases légales possibles","etape":"Etape : Cadre général du RGPD","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Vérifier puis documenter dans l'ordre suivant et par finalité  :","operatoire":["1. Si une loi ou un règlement peut autoriser ce traitement","2. A défaut, si le traitement est directement lié à une mission/pouvoir de l’administration ou s’il est nécessaire à la bonne exécution d’une mission d’intérêt public","3. En dernier lieu, si une autre base légale peut s’appliquer (par ex : recueil du consentement des usagers, ou l’intérêt légitime si les activités sont purement internes mais toujours liées et ou utiles à l’exercice des  missions de l'administration concernée)"],"detail":"1. Si aucune base légale n'est identifiée : \nIl conviendra de suspendre le déploiement du système jusqu’à identification d’une base légale.\nLa base légale devra dépendre de la situation ainsi que du type de traitement.\nIl n'y a toutefois aucune priorité/ ou  classification des bases légales selon un degré d'importance.\nIl conviendra de déterminer si le traitement est bel et bien adapté à la base juridique (par exemple : la loi doit être assez englobante et donc couvrir l'ensemble des besoins ou ne pas aller au-delà de ce qui est objectivement nécessaire).\n\n2. La base légale choisie devra : \nFigurer dans les éléments d’information fournis aux personnes dont les données sont traitées.\nEtre démontrée par une documentation sur le choix de la base légale.\nPas contredir une autre obligation réglementaire et devront s'articuler entre elles.\n\n3.  Le traitement de données dites \"sensibles\" mentionnées à l’article 9 du RGPD, est interdit, sauf exceptions si :     \nLe traitement est valablement fondé sur une des bases légales prévues à l’article 6 du RGPD \nUne des exceptions mentionnées à l’article 9 du RGPD est applicable au traitement concerné (pour l’administration il s’agira le plus souvent du consentement de la personne concernée ou d'une mission d’intérêt public)"}},{"id":"RGPD-04","volet":"RGPD","question":"Une durée de conservation des données a été définie ?","contexte":"La  durée de conservation des données doit être <b>déterminée en fonction de l’objectif de la collecte</b>\n\nL’article 5 e) du RGPD (*), la durée ne doit pas excéder celle nécessaire au regard des finalités du traitement.","etape":"Etape : Cadre général du RGPD","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. Déterminer une durée de conservation selon l'objectif fixé","operatoire":["2. Déterminer des règles et une procédure de suppression des données","3. Déterminer les phases du cycle de vie d’une donnée (indication des durées selon cette distinction)"],"detail":"Le RGPD ne donne pas des durées de conservation précises pour chaque traitement, iI appartient donc au responsable de traitement de déterminer au cas par cas les durées pertinantes : \n\n1. Se poser la question du cadre légal dans l'ordre suivant : \nIdentifier si un texte juridique prévoit une durée de conservation et le cas échéant, déterminer la durée selon les besoins opérationnels. \nDéfinir des durées maximales de conservation. \nDéfinir des durées sur l’ensemble du cycle de vie de la donnée :  de la conservation en base active, en passant par l’archivage intermédiaire jusqu'à l’archivage définitif. Attention il faudra vérifier que vos données pourront être conservées en base intermédiaire ou définitive. \nLe cas échéant,établir une séparation pysique entre la  base active et l'archivage intermédiaire et définitif. \nEffectuer un tri avant d’archiver des données (ne conserver pour l'archivage que celles nécessaires)\n\n2. Ci-après, la méthodologie à suivre si un doute persiste : \nS’appuyer sur les préconisations de la CNIL (lignes directrices, livres blancs...) ou sur les usages spécifiques au métier. Exemple des échanges internes non nominatifs (la conservation  se compte en mois) / les données sur l’usager (conservation dépend des besoins du traitement du dossier)\nSi vous pensez que certaines données doivent être stockées plus longtemps afin d'alimenter l’amélioration du système ou pour des statistiques, il faudra isoler ces données, anonymiser et encadrer strictement cet usage \"annexe\".\n\n3. Documentation et résilience \nFormaliser ces durées <b>sous forme de tableau à plusieurs entrées</b> selon : a. l'activité de traitement visée b. le détail de l'activité c. les phases du cycle de vie des données d. Fondement juridique e.la mise à jour si il y a.  \nMettre en place un processus d’effacement effectif et automatique dès qu'une durée arrive à son terme \nPrévoir des contrôles réguliers permettant de vérifier que la suppression/ou l'archivage s’exécute comme prévu.\nConserver une preuve de l’effacement pour justifier de la conformité"}},{"id":"RGPD-05","volet":"RGPD","question":"Le traitement est adéquat, pertinent et limité à ce qui est nécessaire (minimisation des données)","contexte":"La minimisation s’applique tout au long du traitement et permet de <b>restreindre la collecte à ce qui nécessaire au bon fonctionnement du système d'IA</b>\n\nArticle 5.1 c du RGPD (*) les données doivent être adéquates, pertinentes et limitées à ce qui est nécessaire au regard des finalités pour lesquelles elles sont traitées.","etape":"Etape : Cadre général du RGPD","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre2#Article5","applicable":{"cadrage":false,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1.  Pendant la collecte et les phases de test :","operatoire":["Documenter les catégories de données selon les profils de personnes","Recouper les données selon un premier puis second ensemble de finalités...","Vérifier que la donnée visée n'est pas soumise à une restriction particulière (notamment par décret)","Prévoir une  journalisation des données (il ne faut collecter que celles nécessaires à la traçabilité mais pas le contenu)","2. Au stade de l’utilisation il convient de prévoir une veille et une purge des données régulière et documentée"],"detail":"1.  Pendant la collecte et la phase de test :\nPour les catégories de personnes et de données : Ex : pour l’analyse de document, ne traiter que les champs requis (tranche d’âge plutôt que date de naissance complète)\nPour les restrictions particulières (l'interdiction ou l'autorisation est souvent prévue  par décret). Exemple : la collecte du NIR n'est possible que pour certains cas d’usages du secteur de la santé ou du secteur social.\nPour le jeu de donnée d’entraînement (identifier sa source et son filtrage par le nombre de personnes concernées, la profondeur historique et la granularité) .\nSi possible, utiliser des données fictives ou anonymisées afin de réduire leur précision. \nPour les métriques : elles doivent être utilisées  pour mesure la performance du système et les conséquences pour les personnes concernées. Ces métrqiues doivent être réévaluer en continu. \n\n2. Au stade de l’utilisation :.  \nSi la donnée n'est pas strictement nécéssaire, il est possible de collecter cette données si l'utilisateur peut choisir d'utiliser ou non cette fonctionnalité (principe du consentement)."}},{"id":"RGPD-06","volet":"RGPD","question":"Les données traitées par mon outil sont-elles susceptibles d'être sensibles ou biométriques ?","contexte":"Les <b>données sensibles </b>sont définies à l'article 9 (*) et forment une <b>catégorie particulière de données personnelles</b>. \n\nLes<b> données biométriques </b>correspondent à une sous catégorie de données dites \"sensibles\" et regroupent celles relatives à des <b>caractéristiques physiques, physiologiques ou comportementales</b> (la voix : permet de déduire : l'âge d'un individu, son sexe, ses origines, son éducation, ses ressentis, son état physique ou psychique…)","etape":"Etape : Nature des données traitées","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre1#Article4","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Vérifier que les données peuvent identifier une  personne physique de manière unique","operatoire":["Vérifier que le traitement comporte un risque élevé pour la vie privée et les droits fondamentaux des individus","Vérifier que les données peuvent relever de la prétendue origine raciale ou ethnique, de l’opinion politique, de conviction religieuse ou philosophique ou de l'appartenance syndicale,","Vérifier que le traitement peut concerner des données génétiques ou biométriques"],"detail":"1. Déterminer la composition du système selon : \nles  éléments physiques ou \"matériels\" de gestion du dispositif biométrique (un lecteur d’empreinte digitale, des badges sur lesquels sont stockées les données biométriques)\nles éléments \"logiciels\" les systèmes d’exploitation sur lesquels de telles interfaces sont installées\n\n2. Identifier les trois grands types de dispositifs biométriques :\nLe \"type 1\" ou gabarit sous maîtrise exclusive de la personne concernée\nLe \"type 2\" ou gabarit sous maîtrise partagée\nLe \"type 3\" ou gabarit sous maîtrise exclusive du responsable de traitement"}},{"id":"RGPD-07","volet":"RGPD","question":"Des mesures juridiques sont-elles prises en cas de traitement de données sensibles ou biométriques ?","contexte":"Une donnée sensible ou  biométrique est <b>intransèque à la personne concernée. </b>Dès lors, des mesures approriées et une démarche rigoureuse s'imposent.","etape":"Etape : Nature des données traitées","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre1#Article4","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. Mettre en place des mesures de transparence (informer sur les données traitées, les mises à jour et les dysfonctionnements)","operatoire":["2.Tracer les lignes rouges du projet avant même tout usage expérimental du SIA","3. Permettre à l'utilisateur de garder la main sur les données traitées et receuillir son consentement","5. Démarche expérimentale pour tester et parfaire ces solutions technologiques","6. Démarches administratives afférentes si nécessaire"],"detail":"1. Les démarches administratives et de gouvernance à réaliser :  \nRédiger un décret en Conseil d’État après avis de la CNIL et s’il existe déjà, il faut se fonder sur celui-ci ou le mettre à jour au besoin\nTout organisme public (collectivités locales, ministères, etc.) qui en tant qu’employeur met en oeuvre un traitement biométrique doit appliquer le règlement type proposé par la CNIL\nNommer un responsable de traitement DPO \nFaire une cartographie des données \n\n2.Tracer des lignes rouges du projet avant même tout usage expérimental du SIA\nIdentifier les usages strictement interdits car trop intrustifs de la vie privée et des libertés individuelles\n\n3. Permettre à l'utilisateur de garder la main sur le système d'IA. Par exemple s'il s'agit d'une IA qui a pour but de faire du traitement de voix, l'utilisateur du système pourra couper son micro ou s'opposer à l'enregistrement de sa voix. \n\n4. Mettre en oeuvre une démarche expérimentale qui permettra de tester et de parfaire des solutions techniques respectueuses du cadre juridique (modalités d’évaluation rigoureuse, contradictoire, pluridisciplinaire, limitée dans le temps, dispositif comparé avec d’autres dispositifs techniques)."}},{"id":"RGPD-08","volet":"RGPD","question":"Une Analyse d’Impact sur la Protection des Données (AIPD/PIA) a été réalisée","contexte":"L’analyse d’impact consiste à évaluer les risques liés aux traitements de données personnelles, conformément à l’article 35 du RGPD (*) . \n\nIl repose sur deux piliers :\n1. L'étude des principes et droits fondamentaux par l'application des principes de finalité, base légale, minimisation...\n2. la gestion des risques sur la vie privée, qui permet de déterminer les mesures technique et organisationnelles appropriées.\n\n\nElle doit être <b>menée avant la mise en œuvre du traitement </b>et devra être <b>mise à jour tout au long du cycle de vie du traitement</b>.","etape":"Etape : Nature des données traitées","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre4#Article35","applicable":{"cadrage":false,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Déterminer si une AIPD est nécessaire et désigner les personnes en charge de la réaction le cas échéant ;","operatoire":["Accomplir la démarche de conformité ;","Mettre en place les mesures de résilience."],"detail":"1. Déterminer si une AIPD est nécessaire :  \n- La CNIL propose une liste des traitements impliquent obligatoirement une AIPD :  risques élevés pour la protection des données (usage innovant, traitement à large échelle, données sensibles, personnes vulnérables, ou discrimination automatisée etc.) \n- Si elle répond cumulativement à au moins deux critères ou de façon suffisament grave à l'un de ces critères : l’évaluation/scoring (y compris le profilage), la décision automatique avec effet légal ou similaire, la surveillance systématique, le traitement de données sensibles ou hautement personnelles (santé, géolocalisation, etc.), la collecte à large échelle, le croisement de données, les personnes vulnérables (patients, personnes âgées, enfants, etc.), un usage innovant ou l’exclusion du bénéfice d’un droit/contrat. \n- Adapter son analyse aux risques induits par l' IA (discrimination au regard d'un biais, d'une solution produite, d'une attaque)\n\n2. La démarche de conformité devra reposer sur : \nLe respect des principes et droits fondamentaux, indépendament de la nature, la gravité et la vraisemblance des risques ;\nDes mesures de gestion des risques spécifiques à la vie privée et aux droits reconnus par la charte de l'UE (notamment pour les SIA)\n\n3. Mesures de résilience \nImpliquer au moins dans la rédaction de l'AIPD : le DPO, un référent métier, un expert technique et un juriste. \nSi l’analyse révèle des risques non atténués, saisir la CNIL pour avis avant mise en service. \nSi l’organisme justifie qu’aucun critère de risque élevé n’est rempli et qu’une AIPD n’est pas obligatoire, documenter rigoureusement cette évaluation (il faudra être en mesure de fournir cette preuve en cas de contrôle)."}},{"id":"RGPD-09","volet":"RGPD","question":"Les droits des personnes sont-ils identifiés et les mesures pour leur application sont-elles implémentées ?","contexte":"L'information des utilisateurs vise à assurer la transparence de la collecte et du traitement des données. <b>L'information préalable facilite l'exercice éclairé des droits</b>. \n\nCet exercice des droits permet à l'utilisateur de maîtriser et contrôler les données qui le concerne.\n\nLe CHAPITRE III du RGPD(*) regroupe l'ensemble des ces droits : l<b>'accès, la rectification, l'effacement, la limitation, la portabilité et l'opposition au traitement de leurs données personnelles</b>.","etape":"Etape  : les personnes au cœur du traitment (information et droits)","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre3","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Distinguer clairement le droit à l'information et l'exercice des droits","operatoire":["Vérifier que l'information est concise, transparente, compréhensible et aisément accessible pour les personnes concernées","Faire le bilan des droits applicables et répértorier les demandes d'exercice","S'assurer que l'utilisateur a une bonne compréhension de ses droits","Prévoir des moyens d'action pour rendre effectif l'exercice de ces droits  ( exemple : être en mesure d'isoler ou supprimer les données d'une personne qui en fait la demande dans un  délai raisonnable)"],"detail":"Pour l'information des personnes : \n- Il s'agit de distinguer <b>quand</b> informer (à quel moment la personne reçoit l'information) et <b>comment</b> (intelligibilité - information en termes clairs et simples et l'accessibilité - information individielle, information générale)\n-  Affichage différencié temporellement et visuellement. L’information et l'exercice des droits sur l’interface utilisateur doit se faire via des onglets différents : Pour l’information - un onglet « fonctionnement de l’IA et mes droits » avec la possibilité de télécharger les documents d’information.  Pour l’exercice des droits : un onglet « exercer mes droits » : avec la mise à disposition d’un formulaire... et tracer l’activité des utilisateurs : avec un mail  récap « vous avez exercé votre droit à …. » \n\n2. Pour le cas spécifique du SIA :  exemple avec un chatbot, le premier contact suppose automatiquement un message « vous interagissez avec une IA »,  puis un lien « pour en savoir plus » comprenant des documents d’informations\n\n3. Des allègements, peuvent être prévus au droit à l’information (pour plus d'information veuillez vous diriger vers l’article 14.5 du RGPD), notamment si la personne est déjà informée ou si l’effort d’information est disproportionné. \n\n4. En principe ce droit à l'information devra  comporter  : \n- Des informations individuelle (collecte indirecte ou directe) ou des informations générales : La finalité, la base légale et la durée de conservation des données selon la finalité, le cadre de l'accès aux données (catégories de services interne compétents), les modalités d'exercice des droits.\n- En cas de d'utilisation ultérieure des données il conviendra également d'informer spécifiquement et clairement l’utilisateur de cet usage. \n- En cas d'évolution du logiciel et/ou de mise à jour, l’utilisateur doit en être averti sur la nature des changements et conséquences.\n- En cas de dysfonctionnements : intégrer des mécanismes d’information et d’alerte de l’utilisateur. \n\nPour l'exercice des droits : \n1. S’assurer que l’utilisateur a lors du premier contact fait la distinction entre l’une et l’autre de ces notions : Une case que l’utilisateur doit cocher « j’ai compris » ou « j’accepte les conditions générales d’utilisation » et « j'exerce mon droit à... ». \n\n2. Donner les moyens matériels d'exercer son droit : créer une adresse de contact générique / prévoir un formulaire à préremplir...\n\n3. Fournir la preuve que le droit a bien été prit en compte : exemple mail de confirmation que les données ont bien été supprimées."}},{"id":"RGPD-10","volet":"RGPD","question":"Des mesures techniques et organisationnelles sont-elles prises pour garantir la sécurité des données ?","contexte":"L'article 32 du RGPD (*)  impose de mettre en œuvre des<b> mesures techniques et organisationnelles adaptées</b> pour garantir la sécurité des données personnelles, en fonction du risque associé au traitement.\n\n→ assurer le bon fonctionnement technique d’un SIA <b>permet de prévenir des atteintes  aux droits fondamentaux de la charte</b> : la protection des données (article 8), droit à une bonne administration (article 41), droit à la non discrimination (article 21)","etape":"Etape  : sécurisation des données","lien":"https://www.cnil.fr/fr/reglement-europeen-protection-donnees/chapitre4#Article32","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Signaler à la CNIL dans les 72 heures toutes violations  susceptibles de représenter un risque pour les droits et les libertés des personnes concernées","operatoire":["Prévoir une journalisation des activcités de traitement afin d'expliquer la décision prise par un SIA.  Prévoir en cible (optionnel) une alayse automatique des LOGS.","La réutilisation de donnée s'il y a, ne doit pas cibler une base de donnée manifestement illégale","Remplir la check liste permettant d'avaluer le niveau de sécurité des données personnelles :","https://www.cnil.fr/sites/cnil/files/2024-03/guide_securite_donnees_personnelles_checklist.pdf"],"detail":"1. Mise en place d’un protocole d’action : \n- Il s'agit d'un protocole qui s'active automatiquement dès lors qu’un certain seuil d’alerte  est identifié : selon  la gravité (l’ampleur du risque/le caractère préjudiciable pour les personnes concernées),  la vraisemblance (la possibilité que le risque se réalise/ les vulnérabilités du support), le profil de l’attaquant et la généralisation de l’attaque (le nombre de personnes concernées). \n- Ce  protocole doit  prévoir les types de risque et des solutions dégradées à mettre en œuvre selon les données ciblées lors de l’attaque (données à caractère personnel d’usage courant ou relatives à des personnes vulnérables...)\n\n2. Une démarche de résilience : \n- Simuler des attaques (prévoir une fréquence par an, faire un RETEX, en tirer des conséquences opérationnelles, prévoir des formations ciblées par agent selon les difficultés rencontrées)\n- Eviter le croisement de fonctionnalités par une séparation technique et non pas que juridique (API différentes pour séparer les connexions, des bases de données différentes...).\n- Prévoir une procédure de sauvegarde et de récupération des données en cas d’incident\n- Ne pas faire correspondre des données sensibles avec d'autres fichiers susceptibles d’être collectées (identifiants de l’appareil, localisation, comptes associés, etc.)\n\n3. Pour l'utilisateur,  il convient d'établir un niveau de garantie élevé : \n- CAPTCHA (Completely Automated Public Turing test to tell Computers and Humans Apart) pour s'authentifier sur un compte personnel.\n- Choisir des formats d’importation et de sauvegarde vérifiés et mettre en oeuvre des techniques de tatouage numérique (watermarking).\n- Limiter le nombre d'interface par utilisateur  pour limiter la surface matérielle d'attaque du système\n- Mettre à jour les antivirus et logiciels.\n- Proposer des profils distincts selon les besoins des utilisateurs (leur rôle, leur permiètre d'action, leur habilitation...)"}},{"id":"RGPD-11","volet":"RGPD","question":"Les données personnelles peuvent-elles être anonymisées ?","contexte":"ll peut convenir selon les cas d’usages, d<b>’anonymiser les données</b> pour<b> éviter de façon certaine tout traitement de données personnelles ultérieur</b> pour cause d’un problème technique ou d'une ré identification par croisement de données.","etape":"Etape  : sécurisation des données","lien":"https://www.cnil.fr/fr/technologies/lanonymisation-de-donnees-personnelles","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. Mettre en place un process d’anonymisation ;","operatoire":["2. Effectuer des tests pour évaluer la robustesse de l’anonymisation et le risque de ré-identification ;","3. Si les besoins métiers ne permettent pas de procéder à une anonymisation, il faut prévoir au moins une pseudonomysation des données et documenter ce choix."],"detail":"I. Mettre en place un process d’anonymisation en  plusieurs étapes :  \n   1ère étape : sélection des données pertinentes s’il y a une anonymisation : définir la granularité des données et contextualiser pour confirmer que l’anonymisation n’est pas trop contraignante pour le bon fonctionnement du SIA.  \n    2e étape :  anonymisation soit par randomisation (modifier les attributs dans un jeu de données) / soit par généralisation (modifier l’échelle des attributs des jeux de données)\n    3e étape : documenter les données anonymisées pour  justifier que toutes les mesures techniques et organisationnelles ont été prises en cas de contrôle.\n\nII. Mettre en place des tests pour évaluer la robustesse de l’anonymisation et le risque de ré identification \n   Déterminer des process de mise en situation (scénatios) afin de déterminer des éléments d’identification directs et potentiels (un état civil, un SPI…) en croisant des données. \n   Déterminer des intervalles de test en vue de préserver, dans le temps, le caractère anonyme des données"}},{"id":"RIA-02","volet":"IA Act","question":"Mon système SIA est à risque limité ?","contexte":"En ce qui concerne les SIA à risque minimal, il s'agit ici de l'ensemble des systèmes qui peuvent<b> interagir avec une personne </b>(chatbots) ou  de  tout système d'IA générative  qui manipule du contenu. \n\n\nSon impact négatif se mesure au regard (considérant 48 du RIA)  : \n- Du degré de confiance que place l'utilisateur dans l'IA visée. \n- Du rôle effectif du modèle dans la chaîne décisionnelle. \n- Du degré réel de supervision humaine.","etape":"Etape : Définition du SIA","lien":"https://artificialintelligenceact.eu/fr/chapter/5/","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Distinguer les obligations de transparence issues du RGPD avec celles du règlement sur l'IA","operatoire":["Inscrire son système dans la base de donnée de l'UE"],"detail":"1. Il convient de distinguer les mesures de transparence issues du règlement IA avec celles du RGPD : \n- Distinguer les obligations du RGPD en ce qui concerne l'information des personnes concernant le traitement des données personnelles (finalités, durées de conservation...) et celles du RIA qui impose la rédaction d'un document technique qui détaille notamment les procédures de test et d’évaluation de conformité menées. \n- Prévoir un corpus documentaire unique qui reprend consécutivement ces différentes obligations (différents onglets selon l'obligation de transparence concernée) \n- En bref ce coprus documentaire comprendra dans sa globalité : votre AIPD, votre registre de traitement, votre documentation technique SIA, vos modèles/template de diffusion d'information (sur droits des personnes, explicabilité du SIA, intéraction SIA), votre journal d'activité...)\n\n2. Pour la base de donnée de l'UE : la procédure d'enregistrement et les informations visées sont prévues par l'article 71 du RIA."}},{"id":"RIA-03","volet":"IA Act","question":"J'ai vérifié et confirme que mon SIA peut être considéré comme « à haut risque » ?","contexte":"<b>L’article 6 du RIA</b> définit les Systèmes d’IA à haut risque. \n\nIl précise les critères qui permettent d'évaluer le niveau de risque selon l'impact sur la <b>santé,</b> la <b>sécurité</b> ou les <b>droits fondamentaux. </b>Il est aussi précisé la liste des cas d’usages en annexe III. \n\nAttention : si votre système effectue le profilage de personnes physiques votre système est  toujours considéré comme présentant un risque élevé.<b> Veuillez sélectionner \"Oui\"</b>.","etape":"Etape  : Définition du SIA","lien":"https://artificialintelligenceact.eu/fr/section/3-1/","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Pour info :","operatoire":["La catégorisation en tant qu\"IA à haut risque\" impose des exigences de conformité plus strictes et une gestion des risques plus rigoureuse afin de garantir la sécurité, la confidentialité et la protection des données personnelles des personnes physiques."],"detail":"<b>1. Exigences de conformité renforcées : </b>Les systèmes d'IA à haut risque sont soumis à des exigences de conformité plus strictes, notamment en termes de sécurité, de confidentialité et de protection des données personnelles. \n<b>2. Analyse d'impact sur les droits fondamentaux : </b>Les déployeurs de systèmes d'IA à haut risque doivent effectuer une analyse d'impact sur les droits fondamentaux, (article 27 du règlement), pour évaluer les risques potentiels pour les droits fondamentaux des personnes physiques. \n<b>3. Gestion des risques : </b>La gestion des risques doit inclure l'identification, l'évaluation et la mitigation des risques potentiels pour la santé, la sécurité et les droits fondamentaux des personnes physiques. \n<b>4. Essais et tests :</b> Les systèmes d'IA à haut risque doivent être soumis à des essais et des tests plus rigoureux pour garantir leur conformité aux exigences de sécurité et de performance. \n<b>5. Surveillance et maintenance : </b>Les systèmes d'IA à haut risque doivent être soumis à une surveillance et une maintenance continue pour répondre à des exigences de sécurité et de performance. \n<b>6. Formation et sensibilisation :</b> Les déployeurs de systèmes d'IA à haut risque doivent fournir une formation et une sensibilisation aux utilisateurs et aux personnes impliquées dans la mise en œuvre et la maintenance du système. \n<b>7. Documentation et traçabilité :</b> Notamment en ce qui concerne la traçabilité des décisions et des actions prises par le système. \n<b>8. Conformité aux normes et réglementations :</b> Les systèmes d'IA à haut risque doivent être conformes aux normes et réglementations applicables, notamment en termes de sécurité, de confidentialité et de protection des données.  \n<b>9. Évaluation et certification :</b> Les systèmes d'IA à haut risque peuvent être soumis à des évaluations et des certifications par des organismes tiers pour garantir leur conformité aux exigences de sécurité et de performance. \n<b>10. Responsabilité et accountability : </b>Les déployeurs de systèmes d'IA à haut risque sont responsables de la conformité et doivent pouvoir démontrer leur conformité aux exigences de sécurité et de performance."}},{"id":"RIA-04","volet":"IA Act","question":"L’ensemble des démarches administratives imposées par le RIA et nécessaires à la mise en conformité des SIA ont-elles été réalisées ?","contexte":"La section V du RIA (*) liste les documents à fournir afin de se mettre en conformité avec le RIA  (<b>notamment lorsqu'il s'agit d'une IA à haut risque</b>).","etape":"Etape  : Définition du SIA","lien":"https://artificialintelligenceact.eu/fr/section/3-5/","applicable":{"cadrage":false,"developpement":false,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Etapes structurantes :","operatoire":["Déclaration de conformité","Certificats","Marquage CE","Enregistrement dans la base de donnée de l'UE","Notification des incidents graves","Facultatif :  code de bonne conduite pour les SIA a risque limité. La signature de ce code, aide les fournisseurs à prouver qu'ils respectent les obligations de la loi sur l'IA."],"detail":"Pour les SIA à haut risque :\n\nDispositions (chapitre III section  5 « normes, évaluation de la conformité, certificats, enregistrement)\n\nArticle 44 RIA : L'exigence des certificats est posée par l'article 44. Il est rédigé dans une langue compréhensible, prévoit une durée de validité de 4 à 5 ans et peut être retiré/révoqué si les exigences requises ne sont plus appliquées.\n\nArticle 47 RIA : La déclaration de conformité de l'UE concerne les système d'IA à haut risque. Cette exigence satisfait aux exigences énoncées à la section 2. La déclaration UE contient les informations visées à l'annexe V, et doit être  traduite dans une langue aisément compréhensible. \n\nArticle 48 RIA : Le marquage CE (système d'IA à haut risque) repose sur les principes généraux énoncés à l'article 30 du règlement (CE) n° 765/2008. Ce marquage est indiqué de manière visible, lisible et indélébile. Si une autorité certifiante est intervenue :  le marquage CE est suivi du numéro d'identification de l'organisme notifié responsable des procédures d'évaluation de la conformité visées à l'article 43.   \n\nArticle 49 RIA : L'enregistrement sur la base de donnée de l'UE  comprend la fiche descriptive du SIA, sa fiche PIA (analyse d'impact), ainsi que les informations de contact.\n\nDisposition Chapitre IX du RIA\n\nArticle 73 RIA : La notification des incidents graves pour les IA à haut risque implique d'établir le lien entre le SIA et l’incident (pour déterminer ce qui relève d’un incident grave). Elle doit également être faite dans les 15 jours suivant la découverte de l'incident, puis il conviendra de fournir un premier rapportd'enquête même incomplet. La collaborer avec les autorités pour prendre une décision dans les 7 jours est encouragée.  \n\nPour SIA  risque limité :  il conviendra de vérifier que l’ensemble des autres mesures nécessaires sont prises : déclaration de conformité, traçabilité, transparence des systèmes d'IA, contrôle humain..."}},{"id":"RIA-05","volet":"IA Act","question":"Mon SIA n'utilise pas des données d’utilisation afin d'améliorer son fonctionnement (auto-optimisation après déploiement) ?","contexte":"L'apprentissage continu permet aux modèles de s'adapter en permanence à de nouvelles données et à un nouveau contexte.  \n\nLe SIA sera plus <b>flexible, évolutif et personnalisé</b>.\n\nL'Annexe XIII du RIA (*) classe ces SIA. En effet, selon le niveau d'autonomie ils peuvent présenter un risque systémique. \n→ <b>Encadrer cette optimisation </b>est donc une étape clé afin d’<b>éviter toutes dérives du modèle. </b>","etape":"Etape : L'autonomie du SIA","lien":"https://artificialintelligenceact.eu/fr/annex/13/","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. Cadrer les cas où l’IA doit pouvoir aussi s’améliorer :","operatoire":["Si un dysfonctionnement de l’algorithme est identifié","Si un retour utilisateur est très négatif (atteinte à ses droits par exemple)","2.  Documenter et justifier le fine tuning :","Déterminer des objectifs de l'amélioration et lecadre de l'intervention humaine.","Documenter la solution exploitée pour éviter le ré entraînement non justifié : prompt engineering, Lora (low rank adaptation), RAG (retrieval-augmented generation)","Contourner le sur ajustement : Validation sur des groupes distincts de données et isolés afin d' éviter que les données soient trop ajustées.","Fine tuning progressif  avec des spécialisations de plus en plus précises selon les résultats observés.","Définition des « hyper paramètres » : le taux d’apprentissage, le nombre d’itérations et la taille du lot."],"detail":"1. Maîtrise par l’agent du SIA implique : \n- Une validation par un agent humain pour toute optimisation importante (implique de fixer des seuils : car si l’optimisation est trop importante un contrôle humain est nécessaire)  \n- Offrir aux utilisateurs un choix quant à l’utilisation de leurs données pour l’apprentissage continu. Par exemple, permettre aux agents de marquer certaines conversations comme « à ne pas réutiliser pour entraîner l’IA », ou, si des données d’usagers sont impliquées, prévoir un mécanisme d’opt-out pour ces usagers.\n\n2. Finalité / minimisation\n- Implémenter un système qui permet de supprimer les données d’optimisation plus rapidement (purge automatique plus régulières)\n- Séparer les finalités : considérer l’apprentissage continu comme un traitement à part avec sa propre base légale (souvent il s'agira de l’intérêt légitime du fournisseur dans l'amélioration de son IA et mis en balance avec les droits des personnes). \n- Si possible prévoir des garanties de pseudonymisation des données avant leur réutilisation\n\n3. Prévoir des modes d’apprentissage différenciés : \n- Dysfonctionnement : de l’algorithme \n- Retour utilisateur : donne une contextualisation servant à l’amélioration\n- La collecte pure et simple de nouveaux champ de données\n\n4. Vérifier l’échantillonnage des données d’amélioration :\n- Documenter les éléments  mis à jour et  si auto-tuning (à préciser et dans quel cadre)\n- Vérifier que l'IA ne cible pas les mêmes groupes de personnes ou de données (l’objectif étant d’éviter les discriminations)   \n- Mettre en place un système de validation croisée des données ( qui a pour objectif  de prévoir une réserve de données pour l’entraînement et le reste pour la validation du dataset)"}},{"id":"RIA-06","volet":"IA Act","question":"Le système d’IA embarque-t-il des règles d’auto-limitation ou de conditionnement afin d’éviter les usages abusifs ou détournés ?","contexte":"L'auto-limitation suppose que le SIA est en capacité : \n→ d'<b>informer l'utilisateur qu'il n'a pas la réponse</b> à la question posée ; \n→ qu'il <b>ne peut</b> <b>pas aller au delà de ce pourquoi il est programmé (son code implémente des limites à son autonomie)</b>.","etape":"Etape : L'autonomie du SIA","lien":"","applicable":{"cadrage":false,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Pour éviter les usages abusifs ou détournés d'un système d'IA, il est crucial de prendre des mesures proactives pour garantir la sécurité, la robustesse  la résilience de ces systèmes, ainsi que  veiller à ce qu'ils soient conçus et développés de manière à prévenir les comportements préjudiciables ou indésirables.","operatoire":["Ces mesures doivent être mises en œuvre en respectant les valeurs de l'Union relatives au respect de la dignité humaine, à la liberté, à l'égalité, à la démocratie et à l'état de droit, ainsi que les droits fondamentaux consacrés dans la Charte."],"detail":"Pour éviter les usages abusifs ou détournés d'un système d'IA, il est essentiel de prendre des mesures techniques et organisationnelles  :\n\n1 - Dès la conception, il  est important de concevoir  des solutions techniques qui permettent  au système d'interrompre son fonctionnement en cas d'anomalies ou de fonctionnement en dehors de certaines limites déterminées au préalable.\n\n2 - Il est également important d'avoir des mesures de sécurité après la défaillance. Le SIA doit être conçu pour interrompre son fonctionnement de manière sécurisée avec un système de back qui assure une maintenance. L'interuption doit être historisée pour comprendre la faille.\n\n3 - Garantir la résilience face aux comportements préjudiciables : Les systèmes d'IA à haut risque doit s'intégrer dans environnement spécique et in fine adapter son fonctionnement selon les standards, valeurs, fonctionnement ces derniers.\n\n4 - Infomer la personne qui fait une requête que la réponse n'est pas optiomale ou l'informer que le système n'est pas en meusure de répondre à la problématique posée. Prévoir dans ce cas un renvoi vers des sources fiables humaines ou non."}},{"id":"RIA-07","volet":"IA Act","question":"Des mesures sont-elles prises afin de garantir une qualité suffisante de mes données ?","contexte":"Le considérant 67 du RIA, dispose que \"des ensembles de données de haute qualité pour la formation, la validation et le test nécessitent la mise en œuvre de pratiques appropriées de gouvernance et de gestion des données\".\n\nCes règles impliquent une démarche organisée sur l'ensemble du cycle de vie des données. \nCette démarche s'initie par un diagnotic du risque et s'achève par une phase de définition des méthodes et des processus de remédiation.","etape":"Etape : Démarche de qualité pour le SIA","lien":"","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. Les ensembles de données doivent répondre à plusieurs critères et être :","operatoire":["pertinentes ;","suffisamment représentatives ;","exempts d'erreurs ;","complètes","actuelles,  objectives, et non ambigues","2. Il convient de mettre en place des indicateurs de qualité des données : taux de complétude de la donnée ou d'exactitude, traçer le cycle de vie de la donnée..."],"detail":"1. En amont du traitement quelques bonnes pratiques sont à respecter pour mise en qualité des données : \n- Documenter le processus de collecte des données et l'origine des données ; \n- Préparer les données pour qu'elles soient pertinentes (annotation, étiquetage, nettoyage,  mise à jour, enrichissement et agrégation) ;\n- Formuler des hypothèses, sur ce que les données devront mesurer et représenter ;\n- Vérifier la disponibilité,  la quantité ainsi que  l'adéquation des fichiers de données  ;\n\n2. Mettre en oeuvre des processus de détection d'anomalies pour prévenir la perte de qualité et proposer des KPI sur le taux d'exactitude, de cohérence ou encore de complétude. \n\n3. Identifier des processus de remédiation pour combler les anomalies détectées (suprresion des erreurs, hamonisarion des formats, ajout de donnée)..."}},{"id":"RIA-08","volet":"IA Act","question":"Des garanties de transparence sont-elles prévues notamment quand il s'agit d'un SIA à risque limité ?","contexte":"L'article 13 du RIA (*) prévoit une obligation de transparence pour tout les SIA. Elle permet de <b>comprendre le rôle et le fonctionnement</b> de l'IA. Elle permet également d'informer<b> l'utilisateur final qu'il utilise une IA</b>.\n\nC'est la principale exigence en matière de SIA à risque limité. Elle  est aussi reprise par  l'article L. 311-3-1 du Code des relations entre le public et l'administration (droit d'accès aux documents administratifs)\n\nCes obligations de transparence ne s'appliquent pas si le l'usage d'un SIA est autorisé par la loi pour détecter, prévenir, enquêter ou poursuivre une infraction pénale sous réserve des garanties appropriées","etape":"Etape : Mesures organisationnelles pour une conformité au RIA","lien":"https://artificialintelligenceact.eu/fr/article/13/","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. Etablir une liste à jour de l'ensemble des cas qui vont nécessiter une mesure de transparence (documentation technique et de la notice d'utilisation).","operatoire":["2. Explicitement informer l'utilisateur qu'il intéragit avec une IA :","Il s'agit d'expliquer à l'utilisateur le rôle du SIA dans un environnement déterminé,","Il convient aussi de déterminer quand et comment on informe la personne concernée.","2 bis. Le SIA doit pouvoir apporter une justification à l'utilisateur sur la solution apportée. Par exemple un chatbot doit donner la solution puis expliquer la solution apportée ainsi que son raisonnement. Et justfiier au possible son argumentaire en mentionnant les sources utilisées.","3. Gérer l’identification des personnes"],"detail":"1. Tenir à jour un répertoire communicable de l'ensemble des SIA et les classifier selon leur niveau de risque :  \n- Cette documentation doit être conservée et mise à jour pour toute évolution \"substantielle\" ;\n- Etre synthétique et compréhensible pour l'usager et être épurée des éléments trop techniques.\n\n2. Prévoir pour l'utilisateur un message clair et lisible :    \n-  Dès le premier contact avec une IA en lui indiquant \"vous intéragissez avec une IA\". \n-  Un lien visible \"en savoir +\" qui détaille ce que va faire le SIA \"ce chatbot est conçu pour répondre à ... et vous orienter vers... ll ne remplace pas une intervention humaine conditionnée par... Il fonctionne avec  un ... qui analyse votre question et classe les réponses selon que... et est entraîné sur ...\" \n\n3. Informer les personnes si une mémorisation de l'IA est possible. Pour ce faire il faut : \n- Si possible prévoir un onglet/case à cocher pour pouvoir refuser l'enregistrement par l'IA des intéractions avec la personne concernée.\n- Publier de façon claire, compréhensible les résultats de ce test et du  risque de mémorisation de l'IA.\n\n4. S'appuyer sur des codes pratique au sens de l'article 56  (pas obligatoire)"}},{"id":"RIA-09","volet":"IA Act","question":"Un suivi de la conformité au Règlement IA est-il prévu ?","contexte":"La conformité est un <b>processus continu qui s’adapte aux évolutions technologiques et réglementaires</b> :\n→ Même si un SIA à haut risque fait l'objet d'une première démarche de mise en conformité, <b>une seconde s'impose pour toute évolution importante « substencielle » du système</b> conformément à l'article 43.4 du RIA (*)  \n\n\n<b>Concept OODA LOOP</b> : dans un environnement incertain ou les changements technologiques sont nombreux, le suiivi d'un projet IA est essentiel. Ce cycle reprend le concept de <b>démontrabilité d'une maîtrise de l'IA</b> (Art 4 du RIA) : \n- L'observation (collecter l'information)\n- Orienter (interpréter l'information)\n- Décider (sélectionner l'action)\n- Acter (Implémenter la décision)","etape":"Etape : Mesures organisationnelles pour une conformité au RIA","lien":"https://artificialintelligenceact.eu/fr/section/3-2/","applicable":{"cadrage":false,"developpement":false,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Système de gestion des risques avec signalement en cas d’incident graves","operatoire":["Instaurer une gouvernance minimale","Désigner une personne en charge du maitien du système sur ces aspects de conformité afin d'assurer une gestion continue","Utiliser des indicateurs clés (KPI)","Prévoir des audits réguliers et une boucle de rétroaction pour assurer une amélioration continue"],"detail":"Instaurer une gouvernance minimale en réévaluant périodiquement les risques : \na. tous les ans, refaire un point sur l’AIPD, \nb. vérifier que les mesures recommandées sont toujours en oeuvre et efficaces \nc. une grille technique des mesures selon le type de modifications substantielles identifiées  (ex : usage détourné par un agent malveillant) \nd. Qualification et documentation de ce qu’implique une \"modification substancielle\"    \n\nFaire une veille sur les avancées technologiques et les menaces existentes. \n\nMettre à jour le système (patch de sécurité, nouvelles versions du modèle entraîné sur des données corrigées) \n\nInstitutionnaliser un cycle d’amélioration continue en matière de conformité, planifier, agir, vérifier, ajuster… pour que l’assistant intelligent reste un atout innovant et conforme.\n\nOrganiser des ateliers de travail collaboratifs : qui permettent des RETEX dont le but sera de trouver un langage commun à la conformité. In fine pour hiérarchiser les sujets à traiter selon la criticité des risques catégoriés."}},{"id":"RIA-10","volet":"IA Act","question":"Une intervention humaine est-elle garantie ?","contexte":"L’article 22 du RGPD  interdit la prise de décision fondée exclusivement sur un traitement automatisé de données, ayant des effets juridiques affectant de manière significative la personne (décisions irréversibles non contrôlées)\n\nDe plus, l'article 14 du RIA (*) prévoit une supervision humaine. \n\n<b>Human-in-the-Loop</b> (l'agent intervient dans le processus décisionnel il prend la décision finale)\n\n<b>Human-on-the-Loop</b> (l'agent supervise en temps réel le fonctionnement du SIA et intervient en cas d'alerte automatique)\n\n<b>Human-in-Command</b> (superviser la gouvernance des données)","etape":"Etape  : Place de l'humain dans l'usage du SIA","lien":"https://artificialintelligenceact.eu/fr/article/14/","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Garantir en tout temps l’intervention humaine : opérateurs humains identifiés et avec des moyens d'action (compétence, budget, autorité suffisante).","operatoire":["L'opérateur doit pouvoir modifier manuelllement l'erreur générée par un SIA.","Prévoir la possibilité de recours d’un administré contre toute mesures prises à l'aide d'un SIA."],"detail":"1. Maîtrise du SIA par un agent  : \nIl nécessaire de faire valider par un agent humain toute optimisation trop importante ( dès lors, il s'agit de fixer des seuils ou l’optimisation est trop importante et nécessite un contrôle humain). \nCes seuils d' intervention de l’agent  s'impose pour stopper le fonctionnement d'un SIA (stopper l'accès à un chatbot dans le cadre d'un contrôle, ou d'une révision..). Une notification se déclanche automatiquement. \n\n2. Garanties formalisées (par un protocole) : \nLes personnes en charge des décisions doivent être expressément désignées.   \nDéfinir le degré d'intervention selon le human in command, on et in the loop. Par exemple dans le cas où la décision peut avoir un impact sur l'attribution des droits ou sur la décision RH, il faudra priviligier le human in the loop. Pour un contrôle fiscal ce même niveau de contrôle s'impose.  \nUne justification à chaque décision prise par l'agent humain afin d'éviter les risques de biais (exemple :  éviter l'influence d'un opérateur qui accorde trop de confiance à la réponse donnée par le SIA).\n\n3. En cas de recours d’un administré : \nL'aticle L312-3 CRPA  donne la possibilité d'un recours du contribuable contre l’interprétation d’une règle, même erronée. \nToujiurs conserver le code source : en cas de litige ( il s'agit d'éviter un réseau de neurones  trop opaque et préférer un modèle à règles conditionnelles ou un arbre de décision…)"}},{"id":"RIA-11","volet":"IA Act","question":"L'éthique fait-elle partie intégrante du SIA ?","contexte":"Le chapitre 10 du RIA (*) prévoit la rédaction de lignes directrices et codes de conduite. \n\nL’éthique fait de l’IA un outil au service de l’humain et de l’intérêt général : \n1. Elle assure un usage<b> légitime, transparent et responsable de l’intelligence artificielle</b>. \n2. Elle assure<b> le respect des droits fondamentaux</b> l’<b>équité des décisions</b> \n3. Renforce la<b> confiance du public</b> et<b> encadre l’action des agents</b>.  \n4. Assure la <b>souveraineté technologique</b> de l’État et la <b>maîtrise de sa transformation numérique.</b>","etape":"Etape : Démarches administratives, éthiques et environnementales","lien":"https://artificialintelligenceact.eu/fr/chapter/10/","applicable":{"cadrage":false,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"Faire usage du système d'IA dans un unique but d'intérêt général (définir ce que l'on entend par intérêt général), et dont les bénéfices servent à la société","operatoire":["Favoriser et promouvoir le respect des droits fondamentaux de la charte","Rappeler et mettre en oeuvre les 7 principes non contraignants pour une IA digne de confiance et éthique (considérant 27 du RIA)"],"detail":"1.Apporter un bénéfice à la société : \nLe fonctionnement du SIA doit maximiser le bénéfice \nEtablir en amont des objectifs clairs et des indicateurs de performances pour la réalisation desdits objectifs\nUtiliser le SIA dans le cadre des missions de la DGFIP et répondre à une finalité d’intérêt général\n\n2. Faire intervenir l’ensemble des parties prenantes : administration universités, organisme de recherche, syndicats….\n\n3. Favoriser/faire apparaître  le respect de la charte des droits fondamentaux notamment : \nArt 8 sur la protection des données personnelles ;\nArt 21 sur le  droit à la non discrimination ;\nArticle 34 sur la sécurité sociale et aide sociale ;\nArt 41 sur le droit à une bonne administration.\n\n 4. Sept principes non contraignants pour une IA digne de confiance et éthique (considérant 27 du RIA) : \nl’intervention humaine et la surveillance\nla robustesse technique et la sécurité ;\nla protection de la vie privée ;\nle bien être sociétal et environnemental ;\nla transparence ;\nla diversité ;\nla non discrimination et l’équité.\n\n5. Alignement sur les objectifs de la stratégie nationale pour l’IA : \nPromouvoir une  IA de confiance dans le secteur public. \nIntégrer dès la phase de conception et par défaut, une conformité technique, juridique et sociétale"}},{"id":"AFNOR-01","volet":"AFNOR SPEC / RGESN","question":"Des mesures de frugalité sont-elles prises pour éviter un usage abusif et une finalité disproportionnée de l'IA ?","contexte":"Dans le cadre du cycle de vie de la donnée, la notion de frugalité de l'IA s'interprète \"by design\".  \nLe référentiel AFNOR, définit la frugalité comme : \"l'aptitude à se contenter d’un n<b>iveau de résultat jugé suffisant </b>en redéfinissant les usages et les besoins\"\n\nA cet égard, il faut entendre par \"usage abusif\" tout besoin accessoire ou occassionel et qui par voie de conséquence n'est  pas fondamental ni durable. \n\nDe même, il faut entendre par \"finalité disproportionnée\" toute solution d'IA mise en oeuvre automatiquement et dont la pertinence n'a pas pas été évaluée.","etape":"Etape : Démarches administratives, éthiques et environnementales","lien":"<b>ADEME outil pour calculer votre empreinte carbone : </b>https://agirpourlatransition.ademe.fr/particuliers/conso/conso-responsable/connaissez-vous-votre-empreinte-climat","applicable":{"cadrage":true,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. Vérifier l'utilité du service vs les bénéfices attendus, puis dresser un arbre des conséquences par impacts directs et indirects sur l'environnement (Il convient d'identifier les finalités et les sous finalités de l'usage) ;","operatoire":["2. Vérifier/démontrer qu'aucune autre solution équivalente n'existe pas déjà ;","3. Vérifier la durabilité du service sur le long terme (le développement d'une IA ne doit pas être éphémère/ si possible réutilisable pour d'autres objectifs) ;","4. Intégrer de la sobriété dans l'utilisation des données personnelles. Pour ce faire, il convient de privilégier des données existantes et de  limiter la collecte de nouvelles données : Encadrer la collecte des données au regard des finalités visées."],"detail":"1. Documenter l'utilité d'un service IA :\n- L'IA doit pouvoir servir l'intérêt général ou rentrer dans le champ d'une politique publique. \n- L'utilité du service peut également s'évaluer selon les référentiels suivants  :  Les 17 objectifs de développement durable (ODD) de l’ONU ;  Les 9 limites planétaires ;  la Taxonomie européenne sur les activités vertes ;  La directive CSRD ; la norme ISO 26000 (non certifiable) ; Global Reporting Initiative.\n- Lister les persona ciblées par le service, afin de vérifier que ces personnes ont vraiment besoin du service visé (les interroger directement)\n- Démontrer que la valeur ajoutée du service se justifie au regard des moyens déployés : en quoi le service peut apporter un gain de temps pour les agents, une fluidité des échanges, un service  plus accesible....\n\n2. L'objectif est d' éviter les duplicatas d'applicatifs :  \n- Etudier le marché et le comparer avec son expression de besoin : Benchmark des outils existants.\n- Documenter et démontrer que cette autre solution ne permet pas d'obtenir le même résultat. \n- Si une solution alternative est identifiée, et qu'elle n'implique pas forcément de l'IA, elle doit être privilégiée.\n\n3. Durabilité du service  : \n- Procéder à un calcul qui mesure : l'impact environnemental du dévelopopement du service au regard de l'investissement technique qui aura été fourni\n- Eviter que les efforts soient disproportionnés si le service n'a pas vocation à perdurer\n- Optimiser l'accès par rapport à l'usage attendu (au bon moment et dans le bon contexte), l'usage devant répondre au juste besoin (besoin cible)\n\n4. Limiter la collecte de nouvelles données\n-  Si les finalités du cas d'usage ne le justifient pas ;\n- Vérifier la non obsolescence des données ou si leur qualité ne peut pas être améliorée sans nouvelle données\n- Prévoir des \"caches serveurs\" car ces derniers permettent de stocker des données (stockage temporaire). Moins d'énergie sera consommée car il ne sera pas nécessaire de regénérer une page (moins de données en circulation, moins de routeurs, moins de calcul) = plus de neutralité énergétique.\n- Prévoir un partage de données via API, ce qui évitera l'extraction de nouvelles données"}},{"id":"AFNOR-02","volet":"AFNOR SPEC / RGESN","question":"Des mesures pour maîtriser/encadrer le réentraînement sont-elles prises afin de limiter les impacts environnementaux ?","contexte":"L’entraînement d'une IA peut engendrer une grande consommation d’énergie et de ressources. \nL'objectif est d'évaluer la nécessité d'un reentraînement  pour éviter une consommation énergétique inutile et un surentraînement. \n\nIl faut entendre par réentraînement tout nouveau jeu de données qui permet d'affiner le modèle et de gommer les anomalies. \n\nLe réentraînement s'entend aussi comme l'optimisation du SIA /l'amélioration du résultat/l'intégration de nouveaux paramètres qui généreront de nouveaux contenus et/ou qui viseront un domaine cible.","etape":"Etape : Démarches administratives, éthiques et environnementales","lien":"<b>ADEME outil pour calculer votre empreinte carbone : </b>https://agirpourlatransition.ademe.fr/particuliers/conso/conso-responsable/connaissez-vous-votre-empreinte-climat","applicable":{"cadrage":false,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. En phase de test, il conviendra d'optimiser le fonctionnement l'IA en y intégrant des critères liés à la performance et la qualité des résultats attendus ;","operatoire":["2. Sur le réentraînement il conviendra de :","Définir une fréquence de réentraînement et d'évaluer sa pertinence au regard de critères objectifs de déploiements.","Restreindre les mises à jour du SIA trop régulières ou trop côuteuses pour l'environnement.","Privilégier si possible un modèle déjà pré-entraîné, en ajoutant si besoin d'autres paramètres (fine-tuning)."],"detail":"1. Identifier des KPI pour décider d'un réentraînement : \n- La précision attendue selon un pourcentage prédéfinit. \n- La généralisation ou la personnalisation d'un résultat (résultats variés mais justifiés)\n- L'efficacité et l'interprétabilité du résultat attendu (la solution doit-être claire et compréhensible par l'agent)\n- Evolutivité du résultat si réentraîné \n- Le temps de réponse de l'IA avec un seuil d'acceptation minimal\n\n2. Documenter les phases de test ( et réentraînement) dans une déclaration d'éco-conception : \n- Définir des maîtriques de consommation de ressources CPU , GPU et TPU en corrélation avec des métriques de qualité (le résultat attendu vs ce qui doit être mis en oeuvre) \n- Dès la conception décrire les paramètres de déclanchement d'un réentraînement et démontrer que la prolongation des phases de test ou de réentraînement sont nécessaires au regard de l'études des KPI (ci-dessus) ;\n- Proposer une veille sur \"l'état de l'art\"  qui permettra de justifier l'utilisation d'un modèle nouveau \n- Si possible remplacer les entraînements de deep learning via des techniques de regression ou de réseaux de neurones simples. \n- Identifier les cas où la réponse la plus précise n'est pas nécessaire afin d'éviter un temps d'apprentissage trop long et énergivore"}},{"id":"TRANS-01","volet":"IA Act / AFNOR SPEC / RGESN","question":"Les agents sont-ils régulièrement sensibilisés aux enjeux juridiques, éthiques et environnementaux ?","contexte":"Le déploiement de l'IA au sein de l'administration touche l'ensemble de ses agents, si bien que plusieurs référenciels et règlementations traitent de la sensibilisation/formation aux enjeux éthiques, environnementaux et juridiques. \n\nPar exemple, l'article 4 du RIA (*)  dispose que tout agent devra acquérir la connaissance nécessaire pour prendre des décisions éclairées pendant toutes les phases du cycle de vie d'une IA (développement, utilisation et interprétation).\n\nL'article 10 du RIA (*) souligne l'exitance de biais. La <b>sensibilisation permet </b>in fine la mise en place des garanties contre l’erreur humaine : \n- « Biais d’ancrage » influence trop importante au SIA  avec une priorité à la première impression ;\n- « Biais d’automatisation » confiance trop importante dans la décision proposée par le SIA (sans analyse individuelle); \n- Mauvaise lecture/interprétation de ce qui ressort de l’analyse de l’IA.","etape":"Etape : Démarches administratives, éthiques et environnementales","lien":"https://artificialintelligenceact.eu/fr/article/4/\n\nhttps://artificialintelligenceact.eu/fr/article/10/","applicable":{"cadrage":false,"developpement":true,"test":true,"production":true,"exploitation":true},"criticite":"important","mesures":{"resume":"1. La mise en place de formations obligatoires et le maintien à jour des connaissances et des compétences liées à l'IA  ;","operatoire":["2. Rédiger une politique interne en vue du déploiement du système d'IA  ;","3. Définir des RACI pour déterminer les personnes impliquées dans la démarche éthique, environnementale et juridique  à chaque étape du cycle de vie du service (suivi approprié) ;","4. Favoriser/encourager le recrutement des personnes qualifiées sur ces questions ;","5. Entreprendre une sensibilisation relative à l'impact environnemental d'une fabrication excessive d'équipements trop coûteux (encourager les pratiques de réparation et de reconditionnement)."],"detail":"1. La formation et la sensibilisation sont obligatoires et tiennent compte : \n- Avant tout usage du SIA, un questionnaire de connaissance conditionne l’accès au  SIA ; \n- Un tronc commun relatif aux avantages, risques et garanties liées à l'utilisation des SIA : \n   ex : du droit des personnes (process d'identification et traitement des demandes)  \n   ex : environnement : les causes de l'impact environnemental et la stratégie à adopter pour réduire son enpreinte    \n- Prévoir des auto-formations obligatoires et  des interventions ponctuelles à l'échelle d'une direction/service...\n\n2. Cette politique interne doit/peut  : \n- Etre décidée collégialement et selon les orientations ministérielles\n- Etre diffusée sous plusieurs formes :  \"bonnes pratiques\", chartes...\n- Peut prévoir un prix par an à l'équipe, pôle : avec l'empreinte la moins élévée, la démarche conformité la plus aboutie...    \n\n3. RACI - des  formations dégradées selon les métiers :\n- Cartographier les compétences avec des sachants généralistes (ambassadeurs) ; et  plus spécialisés. \n- Selon le  besoin métier et l'urgence de la formation (priorisation si la formation n'est pas autonome)\n- Une formation personnalisée selon les acquis et le niveau de progression \n- Prévoir un passage à échelle : en amont du projet (formation pour une mise en oeuvre optimale de l'IA), puis  lancement du projet (formation pour une responsabilité interéquipe)\n\n4. Le recrutement des personnes qualifiées suppose : \n- Compétence dans des domaines cibles  ( ex : experts environnementaux). \n- La rédaction de fiches de poste qui prévoient aussi une compétence annexe dans un de ces domaines (éthique, environnement...)  \n\n5. Pour le matériel : sensibiliser les acteurs sur les points suivants : \n- Pour éviter le rachat de matériel inutile  : Vérifier si certains équipements peuvent être mutualisés, \n- Prévoir un échalonnage des calculs des machines notamment le week-end et la nuit (afin d'optimiser la puissance de calcul d'une machine). \n- Vérifier que l'achat d'une machine servira sur la durée et non pas seulement pour un seul projet. \n- Pour le stockage des données : choisir le pays avec une empreinte carbonne la plus basse possible \n- Vérifier s'il est plus opprtun de stocker les données où de réaliser des téléchargements systématiques."}}]};
+
+    const EMBEDDED_NAVIGATION = {"version":"2.0.0","regles":[{"question_id":"SIA-01","reponses":{"oui":{"action":"next","message":"Le système est bien un SIA. Passage à la vérification des pratiques interdites."},"non":{"action":"stop","message":"L'outil n'est pas un système d'IA. Le questionnaire ne s'applique pas. Mettez en œuvre les recommandations RGPD qui vous ont été soumises."}}},{"question_id":"RIA-01","reponses":{"oui":{"action":"next","message":"Le SIA n'est concerné par aucune pratique interdite. Passage au volet RGPD."},"non":{"action":"stop","message":"Le système est concerné par une pratique interdite. Le questionnaire ne peut pas se poursuivre. Vous devez adapter ou abandonner le projet."}}},{"question_id":"RGPD-01","reponses":{"oui":{"action":"skip_section","cible":"RGPD","message":"Le SIA ne traite aucune donnée personnelle. Le volet RGPD ne s'applique pas."},"non":{"action":"next","message":"Le SIA traite des données personnelles. Les questions RGPD s'appliquent."}}},{"question_id":"RGPD-02","reponses":{"oui":{"action":"next","message":"La finalité est déterminée."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RGPD-03","reponses":{"oui":{"action":"next","message":"La base légale est identifiée."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RGPD-04","reponses":{"oui":{"action":"next","message":"La durée de conservation est définie."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RGPD-05","reponses":{"oui":{"action":"next","message":"Le traitement respecte le principe de minimisation."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RGPD-06","reponses":{"oui":{"action":"next","message":"Des données sensibles ou biométriques sont traitées. Passez aux mesures juridiques."},"non":{"action":"goto","cible":"RGPD-09","message":"Pas de données sensibles. Passage direct aux droits des personnes."}}},{"question_id":"RGPD-07","reponses":{"oui":{"action":"next","message":"Les mesures juridiques sont en place."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RGPD-08","reponses":{"oui":{"action":"next","message":"L'AIPD a été réalisée."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RGPD-09","reponses":{"oui":{"action":"next","message":"Les droits des personnes sont identifiés et implémentés."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RGPD-10","reponses":{"oui":{"action":"next","message":"Les mesures de sécurité sont en place."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RGPD-11","reponses":{"oui":{"action":"next","message":"Les données peuvent être anonymisées. Passage au volet IA Act - Classification des risques."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-02","reponses":{"oui":{"action":"goto","cible":"RIA-05","message":"Le SIA est à risque limité. Passage à l'autonomie du SIA."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-03","reponses":{"oui":{"action":"next","message":"Le SIA est à haut risque. Des exigences renforcées s'appliquent."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-04","reponses":{"oui":{"action":"next","message":"Les démarches administratives sont réalisées."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-05","reponses":{"oui":{"action":"next","message":"Le SIA n'utilise pas de données d'utilisation pour s'auto-optimiser."},"non":{"action":"next","message":"Prenez les mesures correctives pour encadrer l'apprentissage continu puis passez à la suite."}}},{"question_id":"RIA-06","reponses":{"oui":{"action":"next","message":"Les règles d'auto-limitation sont en place."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-07","reponses":{"oui":{"action":"next","message":"La qualité des données est garantie."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-08","reponses":{"oui":{"action":"next","message":"Les garanties de transparence sont prévues."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-09","reponses":{"oui":{"action":"next","message":"Le suivi de conformité est prévu."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-10","reponses":{"oui":{"action":"next","message":"L'intervention humaine est garantie."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"RIA-11","reponses":{"oui":{"action":"next","message":"L'éthique est intégrée au SIA."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"AFNOR-01","reponses":{"oui":{"action":"next","message":"Les mesures de frugalité sont prises."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"AFNOR-02","reponses":{"oui":{"action":"next","message":"Le réentraînement est encadré."},"non":{"action":"next","message":"Prenez les mesures correctives puis passez à la suite."}}},{"question_id":"TRANS-01","reponses":{"oui":{"action":"end","message":"Questionnaire terminé. Passage au bilan de conformité."},"non":{"action":"end","message":"Prenez les mesures correctives. Passage au bilan de conformité."}}}]};
+
+    const EMBEDDED_CONFIG = {
+      version: "1.0.0",
+      application: {
+        titre: "Questionnaire de conformité IA",
+        sousTitre: "Auto-évaluation réglementaire pour les systèmes d'intelligence artificielle",
+        organisme: "Direction Générale des Finances Publiques"
+      },
+      interface: {
+        phases: {
+          cadrage: "Cadrage / Conception",
+          developpement: "Développement / Intégration",
+          test: "Test / Validation",
+          production: "Production",
+          exploitation: "Exploitation / Amélioration"
+        }
+      },
+      volets: {
+        "IA Act": { couleur: "#000091" },
+        "RGPD": { couleur: "#CE614A" },
+        "AFNOR SPEC / RGESN": { couleur: "#18753C" },
+        "IA Act / AFNOR SPEC / RGESN": { couleur: "#695240" }
+      },
+      ponderation: {
+        bloquant: { poids: 100, label: "Bloquant" },
+        important: { poids: 75, label: "Important" },
+        recommande: { poids: 50, label: "Recommandé" },
+        facultatif: { poids: 25, label: "Facultatif" }
+      }
+    };
+
+    // ============================================================
+    //  STATE
+    // ============================================================
+    const state = {
+      referentiel: null,
+      navigation: null,
+      config: null,
+      projet: '',
+      // repondant supprimé — date auto-générée
+      date: '',
+      phases: [],
+      questions: [],
+      reponses: {},
+      currentIndex: 0,
+      mode: 'wizard',
+      stopped: false,
+      stoppedAt: null,
+      pendingJeNeSaisPas: null
+    };
+
+    // ============================================================
+    //  SECURITY: Input sanitization
+    // ============================================================
+    function sanitizeText(str) {
+      if (str === null || str === undefined) return '';
+      return String(str);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const el = document.createElement('span');
+      el.textContent = sanitizeText(str);
+      return el.innerHTML;
+    }
+
+    function safeHtml(str) {
+      if (!str) return '';
+      // Replace <b> and </b> with placeholders, escape everything, restore
+      var s = sanitizeText(str);
+      s = s.replace(/<b>/g, '\x00B_OPEN\x00').replace(/<\/b>/g, '\x00B_CLOSE\x00');
+      var el = document.createElement('span');
+      el.textContent = s;
+      s = el.innerHTML;
+      s = s.replace(/\x00B_OPEN\x00/g, '<b>').replace(/\x00B_CLOSE\x00/g, '</b>');
+      return s;
+    }
+
+    // ============================================================
+    //  LOAD DATA — Try external files, fall back to embedded
+    // ============================================================
+    async function loadJSON(url) {
+      try {
+        const resp = await fetch(url, { credentials: 'same-origin' });
+        if (!resp.ok) throw new Error(resp.status + '');
+        const data = await resp.json();
+        return data;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function init() {
+      try {
+        const [ref, nav, cfg] = await Promise.all([
+          loadJSON('referentiel.json'),
+          loadJSON('navigation.json'),
+          loadJSON('config.json')
+        ]);
+
+        state.referentiel = ref || EMBEDDED_REFERENTIEL;
+        state.navigation = nav || EMBEDDED_NAVIGATION;
+        state.config = cfg || EMBEDDED_CONFIG;
+
+        if (!state.referentiel || !state.referentiel.questions) {
+          throw new Error('Référentiel introuvable');
+        }
+        if (!state.navigation || !state.navigation.regles) {
+          throw new Error('Navigation introuvable');
+        }
+
+        // Validate JSON structure
+        validateReferentiel(state.referentiel);
+        validateNavigation(state.navigation, state.referentiel);
+
+        document.getElementById('footer-version').textContent = state.referentiel.version || '—';
+        setupEvents();
+
+      } catch (e) {
+        console.error('Erreur initialisation:', e);
+        document.getElementById('main-content').innerHTML =
+          '<div class="fr-alert fr-alert--error fr-my-4w" role="alert">' +
+          '<h2 class="fr-alert__title">Erreur de chargement</h2>' +
+          '<p>Impossible de charger les fichiers de données (' + escapeHtml(e.message) + ').</p>' +
+          '<p>Vérifiez que <code>referentiel.json</code>, <code>navigation.json</code> et <code>config.json</code> sont dans le même répertoire que cette page.</p>' +
+          '</div>';
+      }
+    }
+
+    // ============================================================
+    //  VALIDATION — Structural checks (§7.4)
+    // ============================================================
+    function validateReferentiel(ref) {
+      if (!Array.isArray(ref.questions)) throw new Error('referentiel.json: "questions" doit être un tableau');
+      const ids = new Set();
+      ref.questions.forEach(function(q, i) {
+        if (!q.id) throw new Error('Question index ' + i + ': "id" manquant');
+        if (ids.has(q.id)) throw new Error('ID dupliqué: ' + q.id);
+        ids.add(q.id);
+        if (!q.question) throw new Error(q.id + ': "question" manquant');
+        if (!q.volet) throw new Error(q.id + ': "volet" manquant');
+        if (!q.mesures || !q.mesures.resume) throw new Error(q.id + ': "mesures.resume" manquant');
+      });
+    }
+
+    function validateNavigation(nav, ref) {
+      const refIds = new Set(ref.questions.map(function(q) { return q.id; }));
+      nav.regles.forEach(function(r) {
+        if (!refIds.has(r.question_id)) {
+          console.warn('Navigation: question_id "' + r.question_id + '" non trouvé dans le référentiel');
+        }
+        // Check goto targets exist
+        Object.values(r.reponses).forEach(function(action) {
+          if (action.action === 'goto' && action.cible && !refIds.has(action.cible)) {
+            console.warn('Navigation: cible "' + action.cible + '" non trouvée dans le référentiel');
+          }
+        });
+      });
+    }
+
+    // ============================================================
+    //  UTILITIES
+    // ============================================================
+    function getVoletClass(volet) {
+      if (!volet) return 'volet-transverse';
+      if (volet.includes('AFNOR') && volet.includes('IA Act')) return 'volet-transverse';
+      if (volet.includes('IA Act')) return 'volet-ia-act';
+      if (volet.includes('RGPD')) return 'volet-rgpd';
+      if (volet.includes('AFNOR')) return 'volet-afnor';
+      return 'volet-transverse';
+    }
+
+    function getCriticiteLabel(c) {
+      var map = { bloquant: 'Bloquant', important: 'Important', recommande: 'Recommandé', facultatif: 'Facultatif' };
+      return map[c] || c;
+    }
+
+    function getNavRule(questionId) {
+      if (!state.navigation) return null;
+      return state.navigation.regles.find(function(r) { return r.question_id === questionId; });
+    }
+
+    function filterQuestions() {
+      if (!state.referentiel) return [];
+      var ph = state.phases;
+      return state.referentiel.questions.filter(function(q) {
+        return ph.some(function(p) { return q.applicable && q.applicable[p] === true; });
+      });
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+      var el = document.getElementById(id);
+      el.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Accessibility: move focus
+      var focusTarget = el.querySelector('[tabindex="-1"], h1, h2, .fr-callout__title');
+      if (focusTarget) {
+        focusTarget.setAttribute('tabindex', '-1');
+        focusTarget.focus({ preventScroll: true });
+      }
+    }
+
+    function showToast(message, isError) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      // Trigger reflow
+      void toast.offsetWidth;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
+
+    function slugify(str) {
+      return String(str).toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '')
+        .substring(0, 50);
+    }
+
+    function csvEscape(str) {
+      if (!str) return '';
+      return String(str).replace(/"/g, '""').replace(/[\r\n]+/g, ' ');
+    }
+
+    // ============================================================
+    //  QUESTION LOGIC — Determine if a response is "conforme"
+    // ============================================================
+    // Questions where "oui" means a risk/concern (inverted logic)
+    var INVERTED_QUESTIONS = ['RGPD-06'];
+    var NEUTRAL_QUESTIONS = ['SIA-01', 'RGPD-01', 'RIA-02', 'RIA-03']; // Filter/classification questions
+
+    function getResponseValue(r) {
+      if (r == null) return r;
+      if (typeof r === 'object' && r.value) return r.value;
+      return r;
+    }
+    function getResponseTexte(r) {
+      if (r && typeof r === 'object' && r.value === 'je_ne_sais_pas') return r.texte || '';
+      return '';
+    }
+
+    function isQuestionConforme(qid, response) {
+      var val = getResponseValue(response);
+      if (!val || val === 'skip') return null; // N/A
+      if (val === 'je_ne_sais_pas') return false; // assimilé à une mauvaise réponse
+      if (NEUTRAL_QUESTIONS.indexOf(qid) !== -1) return true;
+      if (INVERTED_QUESTIONS.indexOf(qid) !== -1) return val === 'non';
+      return val === 'oui';
+    }
+
+    function getQuestionStatus(qid) {
+      var r = state.reponses[qid];
+      if (r === 'skip') return 'na';
+      if (r === null || r === undefined) return 'pending';
+      return isQuestionConforme(qid, r) ? 'conforme' : 'non_conforme';
+    }
+
+    // ============================================================
+    //  EVENTS
+    // ============================================================
+    function setupEvents() {
+      // Form
+      document.getElementById('form-accueil').addEventListener('submit', function(e) {
+        e.preventDefault();
+        startQuestionnaire();
+      });
+
+      // Load session
+      // Tabs — keyboard navigation (RGAA)
+      var tabs = [document.getElementById('tab-wizard'), document.getElementById('tab-audit')];
+      tabs.forEach(function(tab, i) {
+        tab.addEventListener('click', function() { switchMode(i === 0 ? 'wizard' : 'audit'); });
+        tab.addEventListener('keydown', function(e) {
+          var idx = i;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            idx = e.key === 'ArrowRight' ? (i + 1) % 2 : (i + 2 - 1) % 2;
+            tabs[idx].focus();
+            switchMode(idx === 0 ? 'wizard' : 'audit');
+          }
+        });
+      });
+
+      // Bilan tabs
+      var bilanTabs = [document.getElementById('tab-synthese'), document.getElementById('tab-plan')];
+      var bilanPanels = [document.getElementById('panel-synthese'), document.getElementById('panel-plan')];
+      bilanTabs.forEach(function(tab, i) {
+        tab.addEventListener('click', function() {
+          bilanTabs.forEach(function(t, j) {
+            t.setAttribute('aria-selected', j === i ? 'true' : 'false');
+            bilanPanels[j].hidden = j !== i;
+          });
+        });
+      });
+
+      // Save
+      document.getElementById('btn-save-progress').addEventListener('click', saveProgress);
+
+      // Exports
+      document.getElementById('btn-export-pdf').addEventListener('click', exportPDF);
+
+      // Return
+      document.getElementById('btn-retour-questionnaire').addEventListener('click', function() {
+        showScreen('screen-questionnaire');
+      });
+      document.getElementById('btn-retour-accueil').addEventListener('click', function() {
+        if (confirm('Êtes-vous sûr de vouloir recommencer ? Toute progression non sauvegardée sera perdue.')) {
+          resetState();
+          showScreen('screen-accueil');
+        }
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', function(e) {
+        // Ctrl+S to save
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          if (state.questions.length > 0) saveProgress();
+        }
+      });
+    }
+
+    // ============================================================
+    //  START / RESET
+    // ============================================================
+    function startQuestionnaire() {
+      var projet = document.getElementById('input-projet').value.trim();
+      var phaseVal = document.getElementById('select-phase').value;
+      var phases = phaseVal ? [phaseVal] : [];
+
+      var projGroup = document.getElementById('group-projet');
+      var phaseGroup = document.getElementById('group-phase');
+      if (projGroup) projGroup.classList.remove('fr-input-group--error');
+      if (phaseGroup) phaseGroup.classList.remove('fr-input-group--error');
+
+      if (!projet || phases.length === 0) {
+        if (!projet && projGroup) projGroup.classList.add('fr-input-group--error');
+        if (phases.length === 0 && phaseGroup) phaseGroup.classList.add('fr-input-group--error');
+        return;
+      }
+
+      state.projet = projet;
+      state.date = new Date().toLocaleDateString('fr-FR');
+      state.phases = phases;
+      state.questions = filterQuestions();
+      state.reponses = {};
+      state.currentIndex = 0;
+      state.stopped = false;
+      state.stoppedAt = null;
+      state.pendingJeNeSaisPas = null;
+      state.mode = 'wizard';
+
+      if (state.questions.length === 0) {
+        showToast('Aucune question applicable pour les phases sélectionnées.', true);
+        return;
+      }
+
+      state.questions.forEach(function(q) { state.reponses[q.id] = null; });
+
+      showScreen('screen-questionnaire');
+      switchMode('wizard');
+      renderSummary();
+    }
+
+    function resetState() {
+      state.questions = [];
+      state.reponses = {};
+      state.currentIndex = 0;
+      state.stopped = false;
+      state.stoppedAt = null;
+      state.pendingJeNeSaisPas = null;
+      state.mode = 'wizard';
+      document.querySelectorAll('.fr-input-group--error').forEach(function(g) { g.classList.remove('fr-input-group--error'); });
+    }
+
+    // ============================================================
+    //  MODE SWITCH
+    // ============================================================
+    function switchMode(mode) {
+      state.mode = mode;
+      var tabWiz = document.getElementById('tab-wizard');
+      var tabAud = document.getElementById('tab-audit');
+      var panelWiz = document.getElementById('panel-wizard');
+      var panelAud = document.getElementById('panel-audit');
+
+      if (mode === 'wizard') {
+        tabWiz.setAttribute('aria-selected', 'true');
+        tabWiz.tabIndex = 0;
+        tabAud.setAttribute('aria-selected', 'false');
+        tabAud.tabIndex = -1;
+        panelWiz.hidden = false;
+        panelAud.hidden = true;
+        renderWizard();
+      } else {
+        tabAud.setAttribute('aria-selected', 'true');
+        tabAud.tabIndex = 0;
+        tabWiz.setAttribute('aria-selected', 'false');
+        tabWiz.tabIndex = -1;
+        panelAud.hidden = false;
+        panelWiz.hidden = true;
+        renderAudit();
+      }
+    }
+
+    // ============================================================
+    //  WIZARD MODE
+    // ============================================================
+    function renderWizard() {
+      var container = document.getElementById('wizard-question-container');
+      var nav = document.getElementById('wizard-nav');
+      var q = state.questions[state.currentIndex];
+
+      if (!q) {
+        // All questions answered or past end
+        if (Object.values(state.reponses).some(function(v) { return v !== null; })) {
+          goToBilan();
+        }
+        return;
+      }
+
+      // Progress
+      var total = state.questions.length;
+      var answered = Object.values(state.reponses).filter(function(v) { return v !== null; }).length;
+      var pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+
+      document.getElementById('wizard-step-label').textContent =
+        'Question ' + (state.currentIndex + 1) + ' sur ' + total;
+      document.getElementById('wizard-volet-badge').innerHTML =
+        '<span class="volet-badge ' + getVoletClass(q.volet) + '">' + escapeHtml(q.volet) + '</span>' +
+        '<span class="criticite-badge criticite-' + q.criticite + '">' + getCriticiteLabel(q.criticite) + '</span>';
+
+      var bar = document.getElementById('progress-bar');
+      bar.setAttribute('aria-valuenow', pct);
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-text').textContent =
+        answered + ' répondue(s) sur ' + total + ' (' + pct + '%) — Étape : ' + (q.etape || '');
+
+      // Question card
+      if (state.stopped && state.stoppedAt === q.id) {
+        container.innerHTML = renderQuestionCardHTML(q, true);
+      } else {
+        container.innerHTML = renderQuestionCardHTML(q, false);
+      }
+      attachQuestionEvents(q, container);
+
+      // Nav buttons
+      var navHtml = '<div>';
+      if (state.currentIndex > 0) {
+        navHtml += '<button type="button" class="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-arrow-left-line" id="btn-prev" aria-label="Question précédente">Précédent</button>';
+      }
+      navHtml += '</div><div>';
+      if (state.currentIndex === total - 1 && state.reponses[q.id] !== null) {
+        navHtml += '<button type="button" class="fr-btn fr-btn--icon-right fr-icon-checkbox-circle-line" id="btn-finish">Voir le bilan</button>';
+      }
+      navHtml += '</div>';
+      nav.innerHTML = navHtml;
+
+      var prevBtn = document.getElementById('btn-prev');
+      if (prevBtn) {
+        prevBtn.addEventListener('click', function() {
+          // Go back, skipping 'skip' questions
+          var idx = state.currentIndex - 1;
+          while (idx >= 0 && state.reponses[state.questions[idx].id] === 'skip') {
+            idx--;
+          }
+          state.currentIndex = Math.max(0, idx);
+          renderWizard();
+        });
+      }
+      var finishBtn = document.getElementById('btn-finish');
+      if (finishBtn) {
+        finishBtn.addEventListener('click', goToBilan);
+      }
+    }
+
+    function renderQuestionCardHTML(q, isStopped) {
+      var resp = state.reponses[q.id];
+      var respVal = getResponseValue(resp);
+      var pendingCustom = state.pendingJeNeSaisPas === q.id;
+      var html = '<div class="question-card' + (isStopped ? ' stopped' : '') + '" role="group" aria-labelledby="q-title-' + q.id + '">';
+
+      html += '<p class="fr-text--sm fr-mb-1w" style="color:#666"><strong>' + escapeHtml(q.etape || '') + '</strong></p>';
+      html += '<h2 id="q-title-' + q.id + '" class="fr-h4 fr-mb-2w">' + escapeHtml(q.question) + '</h2>';
+
+      // Description (toujours ouverte)
+      html += '<div class="question-description fr-mb-2w">';
+      html += '<div class="fr-mt-1w fr-text--sm" style="white-space:pre-line">' + safeHtml(q.contexte) + '</div>';
+      if (q.lien) {
+        html += '<p class="fr-mt-1w"><a href="' + escapeHtml(q.lien) + '" target="_blank" rel="noopener noreferrer" class="fr-link">';
+        html += 'Référence juridique';
+        html += '<span class="sr-only"> (ouvre un nouvel onglet)</span></a></p>';
+      }
+      if (q.date_entree_vigueur) {
+        var dev = new Date(q.date_entree_vigueur);
+        var now = new Date();
+        var isActive = now >= dev;
+        html += '<p class="fr-mt-1w fr-text--xs">';
+        html += isActive
+          ? '<span style="color:#18753C">&#x2714; En vigueur depuis le ' + dev.toLocaleDateString('fr-FR') + '</span>'
+          : '<span style="color:#B34000">&#x23F3; Entrée en vigueur le ' + dev.toLocaleDateString('fr-FR') + '</span>';
+        html += '</p>';
+      }
+      html += '</div>';
+
+      if (pendingCustom) {
+        html += '<div class="fr-input-group fr-mt-2w" id="je-ne-sais-pas-block">';
+        html += '<label class="fr-label" for="je-ne-sais-pas-text">Précisez (optionnel)</label>';
+        html += '<textarea class="fr-input" id="je-ne-sais-pas-text" rows="3" placeholder="Votre précision…" maxlength="1000"></textarea>';
+        html += '<button type="button" class="fr-btn fr-mt-2w" id="btn-validate-je-ne-sais-pas" data-question="' + q.id + '">Valider</button>';
+        html += '</div>';
+      } else {
+        // Response buttons
+      html += '<div class="btn-group" role="group" aria-label="Répondre à la question">';
+      html += '<button type="button" class="fr-btn btn-response ' + (respVal === 'oui' ? '' : 'fr-btn--secondary') + '"';
+      html += ' data-response="oui" data-question="' + q.id + '"';
+      html += ' aria-pressed="' + (respVal === 'oui') + '"';
+      html += isStopped ? ' disabled' : '';
+      html += '>Oui</button>';
+      html += '<button type="button" class="fr-btn btn-response ' + (respVal === 'non' ? '' : 'fr-btn--secondary') + '"';
+      html += ' data-response="non" data-question="' + q.id + '"';
+      html += ' aria-pressed="' + (respVal === 'non') + '"';
+      html += isStopped ? ' disabled' : '';
+      html += '>Non</button>';
+      html += '<button type="button" class="fr-btn btn-response ' + (respVal === 'je_ne_sais_pas' ? '' : 'fr-btn--secondary') + '"';
+      html += ' data-response="je_ne_sais_pas" data-question="' + q.id + '"';
+      html += ' aria-pressed="' + (respVal === 'je_ne_sais_pas') + '"';
+      html += isStopped ? ' disabled' : '';
+      html += '>Je ne sais pas</button>';
+      html += '</div>';
+      if (respVal === 'je_ne_sais_pas' && getResponseTexte(resp)) {
+        html += '<p class="fr-text--sm fr-mt-2w" style="font-style:italic;color:#666">Votre précision : ' + escapeHtml(getResponseTexte(resp)) + '</p>';
+      }
+      }
+
+      var effectiveResp = respVal === 'je_ne_sais_pas' ? 'non' : respVal;
+      var rule = getNavRule(q.id);
+      if (resp && resp !== 'skip' && rule && rule.reponses[effectiveResp]) {
+        var msg = rule.reponses[effectiveResp].message;
+        if (msg) {
+          var isError = rule.reponses[effectiveResp].action === 'stop';
+          html += '<div class="fr-alert ' + (isError ? 'fr-alert--error' : 'fr-alert--info') + ' fr-mt-2w" role="status">';
+          html += '<p>' + escapeHtml(msg) + '</p></div>';
+        }
+      }
+
+      // Corrective measures (shown when non-conforme)
+      if (resp !== null && resp !== 'skip' && !isQuestionConforme(q.id, resp)) {
+        html += renderMesuresHTML(q);
+      }
+
+      // Stop banner
+      if (isStopped) {
+        html += '<div class="stop-banner" role="alert" aria-live="assertive">';
+        html += '<p class="fr-text--bold fr-text--lg">';
+        html += '<span class="fr-icon-error-line" aria-hidden="true"></span> Questionnaire arrêté';
+        html += '</p>';
+        html += '<p>Une non-conformité bloquante a été détectée. Le système ne peut pas être déployé en l\'état. Veuillez prendre les mesures correctives indiquées.</p>';
+        html += '<button type="button" class="fr-btn fr-mt-2w" id="btn-bilan-from-stop">Voir le bilan partiel</button>';
+        html += '</div>';
+      }
+
+      // Bouton Précédent pour revenir modifier les réponses
+      if (state.currentIndex > 0) {
+        html += '<div class="wizard-nav wizard-nav--card fr-mt-3w">';
+        html += '<button type="button" class="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-arrow-left-line" id="btn-prev-card" aria-label="Revenir à la question précédente pour modifier">Précédent</button>';
+        html += '</div>';
+      }
+
+      html += '</div>';
+      return html;
+    }
+
+    function stripLeadingNumber(text) {
+      if (typeof text !== 'string') return text;
+      return text.replace(/^\s*\d+[.)]\s*/, '').trim();
+    }
+
+    function renderMesuresHTML(q, expandedForPlan) {
+      var html = '<div class="mesures-box" role="region" aria-label="Mesures correctives">';
+      html += '<p class="fr-text--bold fr-mb-1w"><span class="fr-icon-warning-line fr-icon--sm" aria-hidden="true"></span> Mesures correctives</p>';
+      html += '<p>' + safeHtml(q.mesures.resume) + '</p>';
+
+      if (q.mesures.operatoire && q.mesures.operatoire.length > 0) {
+        if (expandedForPlan) {
+          html += '<p class="fr-text--bold fr-mt-2w fr-mb-1v">Comment faire ?</p>';
+          html += '<ol class="fr-mt-1w fr-pl-3w">';
+          q.mesures.operatoire.forEach(function(step) {
+            html += '<li class="fr-mb-1w">' + safeHtml(stripLeadingNumber(step)) + '</li>';
+          });
+          html += '</ol>';
+        } else {
+          html += '<details class="fr-mt-1w"><summary>Comment faire ?</summary>';
+          html += '<ol class="fr-mt-1w fr-pl-3w">';
+          q.mesures.operatoire.forEach(function(step) {
+            html += '<li class="fr-mb-1w">' + safeHtml(stripLeadingNumber(step)) + '</li>';
+          });
+          html += '</ol></details>';
+        }
+      }
+
+      if (q.mesures.detail) {
+        html += '<details class="fr-mt-1w"><summary>En savoir plus (détail juridique)</summary>';
+        html += '<div class="fr-mt-1w fr-text--sm" style="white-space:pre-line">' + safeHtml(q.mesures.detail) + '</div>';
+        html += '</details>';
+      }
+
+      html += '</div>';
+      return html;
+    }
+
+    function attachQuestionEvents(q, container) {
+      container.querySelectorAll('.btn-response').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var resp = this.getAttribute('data-response');
+          if (resp === 'je_ne_sais_pas') {
+            state.pendingJeNeSaisPas = q.id;
+            renderWizard();
+            renderSummary();
+            return;
+          }
+          handleResponse(q.id, resp);
+        });
+      });
+      var validateBtn = container.querySelector('#btn-validate-je-ne-sais-pas');
+      if (validateBtn) {
+        validateBtn.addEventListener('click', function() {
+          var textarea = document.getElementById('je-ne-sais-pas-text');
+          var texte = textarea ? textarea.value.trim() : '';
+          handleResponse(this.getAttribute('data-question'), 'je_ne_sais_pas', texte);
+        });
+      }
+      var stopBtn = container.querySelector('#btn-bilan-from-stop');
+      if (stopBtn) {
+        stopBtn.addEventListener('click', goToBilan);
+      }
+      var prevCardBtn = container.querySelector('#btn-prev-card');
+      if (prevCardBtn) {
+        prevCardBtn.addEventListener('click', function() {
+          var idx = state.currentIndex - 1;
+          while (idx >= 0 && state.reponses[state.questions[idx].id] === 'skip') {
+            idx--;
+          }
+          state.currentIndex = Math.max(0, idx);
+          renderWizard();
+          renderSummary();
+        });
+      }
+    }
+
+    function handleResponse(questionId, response, customText) {
+      if (response === 'je_ne_sais_pas' && customText !== undefined) {
+        state.reponses[questionId] = { value: 'je_ne_sais_pas', texte: customText };
+        state.pendingJeNeSaisPas = null;
+      } else if (response !== 'je_ne_sais_pas') {
+        state.reponses[questionId] = response;
+      }
+
+      var effectiveResponse = (response === 'je_ne_sais_pas' && customText !== undefined) ? 'non' : response;
+      var rule = getNavRule(questionId);
+      if (rule && rule.reponses[effectiveResponse]) {
+        var action = rule.reponses[effectiveResponse];
+
+        switch (action.action) {
+          case 'stop':
+            state.stopped = true;
+            state.stoppedAt = questionId;
+            renderWizard();
+            renderSummary();
+            return;
+
+          case 'skip_section':
+            var cible = action.cible;
+            state.questions.forEach(function(q) {
+              if (q.volet === cible && q.id !== questionId && state.reponses[q.id] === null) {
+                state.reponses[q.id] = 'skip';
+              }
+            });
+            // Find next non-skipped question
+            var nextIdx = state.currentIndex + 1;
+            while (nextIdx < state.questions.length &&
+                   (state.questions[nextIdx].volet === cible || state.reponses[state.questions[nextIdx].id] === 'skip')) {
+              nextIdx++;
+            }
+            state.currentIndex = nextIdx;
+            break;
+
+          case 'goto':
+            var target = action.cible;
+            var tIdx = state.questions.findIndex(function(q) { return q.id === target; });
+            if (tIdx >= 0) {
+              // Mark intermediate questions as skipped
+              for (var si = state.currentIndex + 1; si < tIdx; si++) {
+                if (state.reponses[state.questions[si].id] === null) {
+                  state.reponses[state.questions[si].id] = 'skip';
+                }
+              }
+              state.currentIndex = tIdx;
+            } else {
+              state.currentIndex++;
+            }
+            break;
+
+          case 'end':
+            goToBilan();
+            return;
+
+          case 'next':
+          default:
+            state.currentIndex++;
+            break;
+        }
+      } else {
+        state.currentIndex++;
+      }
+
+      renderWizard();
+      renderSummary();
+      if (state.mode === 'audit') renderAudit();
+    }
+
+    // ============================================================
+    //  AUDIT MODE
+    // ============================================================
+    function renderAudit() {
+      var container = document.getElementById('audit-container');
+      var html = '';
+
+      // Group by volet preserving order
+      var voletOrder = [];
+      var voletMap = {};
+      state.questions.forEach(function(q) {
+        if (!voletMap[q.volet]) {
+          voletMap[q.volet] = [];
+          voletOrder.push(q.volet);
+        }
+        voletMap[q.volet].push(q);
+      });
+
+      voletOrder.forEach(function(volet) {
+        html += '<div class="fr-mb-3w" role="region" aria-label="Volet ' + escapeHtml(volet) + '">';
+        html += '<h3 class="fr-h5"><span class="volet-badge ' + getVoletClass(volet) + '">' + escapeHtml(volet) + '</span></h3>';
+
+        voletMap[volet].forEach(function(q) {
+          var resp = state.reponses[q.id];
+          var isSkipped = resp === 'skip';
+
+          var respVal = getResponseValue(resp);
+          html += '<div class="audit-question' + (isSkipped ? ' audit-skipped' : '') + '" id="audit-q-' + q.id + '">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem">';
+          html += '<p class="fr-text--bold fr-mb-0">' + escapeHtml(q.question) + '</p>';
+          html += '<span class="criticite-badge criticite-' + q.criticite + '">' + getCriticiteLabel(q.criticite) + '</span>';
+          html += '</div>';
+
+          if (!isSkipped) {
+            html += '<fieldset class="audit-response" aria-label="Réponse">';
+            html += '<legend class="sr-only">Réponse à : ' + escapeHtml(q.question) + '</legend>';
+            html += '<div class="fr-radio-group fr-radio-group--inline">';
+            html += '<input type="radio" id="audit-' + q.id + '-oui" name="audit-' + q.id + '" value="oui"' + (respVal === 'oui' ? ' checked' : '') + '>';
+            html += '<label class="fr-label" for="audit-' + q.id + '-oui">Oui</label>';
+            html += '</div>';
+            html += '<div class="fr-radio-group fr-radio-group--inline">';
+            html += '<input type="radio" id="audit-' + q.id + '-non" name="audit-' + q.id + '" value="non"' + (respVal === 'non' ? ' checked' : '') + '>';
+            html += '<label class="fr-label" for="audit-' + q.id + '-non">Non</label>';
+            html += '</div>';
+            html += '<div class="fr-radio-group fr-radio-group--inline">';
+            html += '<input type="radio" id="audit-' + q.id + '-jns" name="audit-' + q.id + '" value="je_ne_sais_pas"' + (respVal === 'je_ne_sais_pas' ? ' checked' : '') + '>';
+            html += '<label class="fr-label" for="audit-' + q.id + '-jns">Je ne sais pas</label>';
+            html += '</div>';
+            if (respVal === 'je_ne_sais_pas') {
+              html += '<div class="fr-input-group fr-mt-1w"><label class="fr-label" for="audit-' + q.id + '-jns-text">Précisez (optionnel)</label>';
+              html += '<textarea class="fr-input" id="audit-' + q.id + '-jns-text" rows="2" placeholder="Votre précision…" maxlength="1000">' + escapeHtml(getResponseTexte(resp)) + '</textarea></div>';
+            }
+            html += '</fieldset>';
+
+            if (resp !== null && !isQuestionConforme(q.id, resp)) {
+              html += renderMesuresHTML(q);
+            }
+          } else {
+            html += '<p class="fr-text--sm fr-mt-1w" style="font-style:italic;color:#666">Non applicable (volet ignoré)</p>';
+          }
+
+          html += '</div>';
+        });
+
+        html += '</div>';
+      });
+
+      html += '<div class="fr-mt-3w">';
+      html += '<button type="button" class="fr-btn fr-btn--icon-right fr-icon-checkbox-circle-line" id="btn-audit-bilan">Voir le bilan</button>';
+      html += '</div>';
+
+      container.innerHTML = html;
+
+      state.questions.forEach(function(q) {
+        var radios = container.querySelectorAll('input[name="audit-' + q.id + '"]');
+        radios.forEach(function(radio) {
+          radio.addEventListener('change', function() {
+            var val = this.value;
+            if (val === 'je_ne_sais_pas') {
+              var existing = state.reponses[q.id];
+              state.reponses[q.id] = { value: 'je_ne_sais_pas', texte: (existing && typeof existing === 'object' && existing.texte) ? existing.texte : '' };
+            } else {
+              state.reponses[q.id] = val;
+            }
+
+            var effectiveVal = val === 'je_ne_sais_pas' ? 'non' : val;
+            var rule = getNavRule(q.id);
+            if (rule && rule.reponses[effectiveVal]) {
+              var action = rule.reponses[effectiveVal];
+              if (action.action === 'skip_section') {
+                state.questions.forEach(function(sq) {
+                  if (sq.volet === action.cible && sq.id !== q.id) {
+                    state.reponses[sq.id] = 'skip';
+                  }
+                });
+              } else if (action.action === 'stop') {
+                state.stopped = true;
+                state.stoppedAt = q.id;
+              }
+              if (q.id === 'RGPD-01' && effectiveVal === 'oui') {
+                state.questions.forEach(function(sq) {
+                  if (sq.volet === 'RGPD' && sq.id !== 'RGPD-01' && state.reponses[sq.id] === 'skip') {
+                    state.reponses[sq.id] = null;
+                  }
+                });
+              }
+              if (q.id === 'RIA-01' && effectiveVal === 'non') {
+                state.stopped = false;
+                state.stoppedAt = null;
+              }
+            }
+
+            renderAudit();
+            renderSummary();
+          });
+        });
+        var jnsText = container.querySelector('#audit-' + q.id + '-jns-text');
+        if (jnsText) {
+          jnsText.addEventListener('input', function() {
+            var r = state.reponses[q.id];
+            if (r && typeof r === 'object' && r.value === 'je_ne_sais_pas') {
+              r.texte = this.value;
+              renderSummary();
+            }
+          });
+        }
+      });
+
+      var bilanBtn = container.querySelector('#btn-audit-bilan');
+      if (bilanBtn) bilanBtn.addEventListener('click', goToBilan);
+    }
+
+    // ============================================================
+    //  SUMMARY PANEL — Real-time
+    // ============================================================
+    function renderSummary() {
+      var details = document.getElementById('summary-details');
+      var stats = computeStats();
+
+      // SVG Gauge
+      var total = stats.conforme + stats.nonConforme;
+      var pct = total > 0 ? Math.round((stats.conforme / total) * 100) : 0;
+      var circumference = 2 * Math.PI * 60; // r=60
+      var offset = total > 0 ? circumference * (1 - pct / 100) : circumference;
+
+      var gaugeColor = '#929292';
+      if (total > 0) {
+        if (pct >= 75) gaugeColor = '#18753C';
+        else if (pct >= 50) gaugeColor = '#B34000';
+        else if (pct >= 25) gaugeColor = '#695240';
+        else gaugeColor = '#CE0500';
+      }
+
+      var circle = document.getElementById('gauge-circle');
+      circle.setAttribute('stroke', gaugeColor);
+      circle.setAttribute('stroke-dashoffset', offset.toFixed(1));
+
+      document.getElementById('gauge-text').textContent = total > 0 ? pct + '%' : '—';
+      document.getElementById('gauge-label').textContent = total > 0
+        ? stats.conforme + ' conforme(s) / ' + stats.nonConforme + ' non conforme(s)'
+        : 'Aucune question répondue';
+
+      // Details by volet
+      var html = '';
+      var voletOrder = [];
+      state.questions.forEach(function(q) {
+        if (voletOrder.indexOf(q.volet) === -1) voletOrder.push(q.volet);
+      });
+
+      voletOrder.forEach(function(volet) {
+        var vs = stats.parVolet[volet];
+        if (!vs) return;
+        var vTotal = vs.conforme + vs.nonConforme;
+        html += '<div class="summary-item">';
+        html += '<span class="fr-text--sm">' + escapeHtml(volet) + '</span>';
+        if (vTotal > 0) {
+          html += '<span class="fr-text--sm fr-text--bold" style="color:' + (vs.nonConforme > 0 ? '#CE0500' : '#18753C') + '">';
+          html += vs.conforme + '/' + vTotal + '</span>';
+        } else {
+          html += '<span class="fr-text--sm" style="color:#929292">' + (vs.na > 0 ? 'N/A' : '—') + '</span>';
+        }
+        html += '</div>';
+      });
+
+      // Non-conformities
+      var nonConformes = state.questions.filter(function(q) {
+        var r = state.reponses[q.id];
+        return r !== null && r !== 'skip' && !isQuestionConforme(q.id, r);
+      });
+
+      if (nonConformes.length > 0) {
+        html += '<p class="fr-text--bold fr-mt-2w fr-mb-1w fr-text--sm" style="color:#CE0500">';
+        html += nonConformes.length + ' point(s) de non-conformité</p>';
+        html += '<ul class="fr-text--xs" style="padding-left:1rem">';
+        nonConformes.forEach(function(q) {
+          var r = state.reponses[q.id];
+          var customTexte = getResponseTexte(r);
+          var label = escapeHtml(q.question.substring(0, 50)) + (q.question.length > 50 ? '…' : '');
+          if (customTexte) label += ' <span style="font-style:italic;color:#666">— ' + escapeHtml(customTexte.substring(0, 40)) + (customTexte.length > 40 ? '…' : '') + '</span>';
+          html += '<li class="fr-mb-1v"><a href="#" class="fr-link summary-goto" data-qid="' + q.id + '" title="Aller à cette question">';
+          html += label + '</a></li>';
+        });
+        html += '</ul>';
+      }
+
+      details.innerHTML = html;
+
+      // Click to navigate
+      details.querySelectorAll('.summary-goto').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          var qid = this.getAttribute('data-qid');
+          var idx = state.questions.findIndex(function(q) { return q.id === qid; });
+          if (idx >= 0) {
+            state.currentIndex = idx;
+            if (state.mode !== 'wizard') switchMode('wizard');
+            else renderWizard();
+          }
+        });
+      });
+    }
+
+    function computeStats() {
+      var stats = { conforme: 0, nonConforme: 0, na: 0, parVolet: {} };
+
+      state.questions.forEach(function(q) {
+        var r = state.reponses[q.id];
+        if (!stats.parVolet[q.volet]) {
+          stats.parVolet[q.volet] = { conforme: 0, nonConforme: 0, na: 0 };
+        }
+
+        if (r === 'skip' || r === null || r === undefined) {
+          stats.na++;
+          stats.parVolet[q.volet].na++;
+        } else {
+          if (isQuestionConforme(q.id, r)) {
+            stats.conforme++;
+            stats.parVolet[q.volet].conforme++;
+          } else {
+            stats.nonConforme++;
+            stats.parVolet[q.volet].nonConforme++;
+          }
+        }
+      });
+
+      return stats;
+    }
+
+    // ============================================================
+    //  BILAN
+    // ============================================================
+    var SYNTHESE_STORAGE_KEY = 'questionnaire-ia-synthese';
+
+    function goToBilan() {
+      showScreen('screen-bilan');
+      renderBilan();
+      saveBilanToServer();
+    }
+
+    function saveBilanToServer() {
+      var data = buildExportData();
+      var entry = {
+        id: Date.now(),
+        completedAt: new Date().toISOString(),
+        meta: data.meta,
+        score: data.score,
+        resultats: data.resultats
+      };
+
+      var apiUrl = (state.config && state.config.resultatsApiUrl) ? state.config.resultatsApiUrl : 'save-resultats.php';
+
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      }).then(function(res) {
+        return res.json().then(function(body) {
+          if (res.ok && body.success) {
+            showToast('Résultats enregistrés sur le serveur');
+          } else {
+            throw new Error(body.error || 'Erreur serveur');
+          }
+        }).catch(function() {
+          if (!res.ok) throw new Error('Erreur ' + res.status);
+        });
+      }).catch(function() {
+        saveBilanToLocalStorage();
+      });
+    }
+
+    function saveBilanToLocalStorage() {
+      try {
+        var data = buildExportData();
+        var entry = {
+          id: Date.now(),
+          completedAt: new Date().toISOString(),
+          meta: data.meta,
+          score: data.score,
+          resultats: data.resultats
+        };
+        var list = [];
+        try {
+          var raw = localStorage.getItem(SYNTHESE_STORAGE_KEY);
+          if (raw) list = JSON.parse(raw);
+          if (!Array.isArray(list)) list = [];
+        } catch (e) { list = []; }
+        list.unshift(entry);
+        localStorage.setItem(SYNTHESE_STORAGE_KEY, JSON.stringify(list));
+        showToast('Résultats enregistrés localement (serveur indisponible)');
+      } catch (e) {
+        showToast('Impossible d\'enregistrer les résultats', true);
+      }
+    }
+
+    function renderBilan() {
+      var stats = computeStats();
+      var totalEval = stats.conforme + stats.nonConforme;
+      var pct = totalEval > 0 ? Math.round((stats.conforme / totalEval) * 100) : 0;
+      var phasesStr = state.phases.map(function(p) {
+        return state.config && state.config.interface && state.config.interface.phases
+          ? (state.config.interface.phases[p] || p) : p;
+      }).join(', ');
+
+      // Gauge
+      var gaugeColor = pct >= 75 ? '#18753C' : pct >= 50 ? '#B34000' : pct >= 25 ? '#695240' : '#CE0500';
+      if (totalEval === 0) gaugeColor = '#929292';
+      var circumference = 2 * Math.PI * 60;
+      var offset = circumference - (pct / 100) * circumference;
+      var gc = document.getElementById('bilan-gauge-circle');
+      gc.setAttribute('stroke', gaugeColor);
+      gc.setAttribute('stroke-dashoffset', totalEval > 0 ? offset : circumference);
+      document.getElementById('bilan-gauge-text').textContent = totalEval > 0 ? pct + '%' : '--';
+      document.getElementById('bilan-gauge-label').textContent = totalEval > 0
+        ? (pct >= 75 ? 'Bon niveau de conformite' : pct >= 50 ? 'Conformite partielle' : 'Conformite insuffisante')
+        : 'Aucune question evaluee';
+
+      // Meta cards
+      var metaHtml = '';
+      metaHtml += '<div class="bilan-meta-card"><dt>Projet</dt><dd>' + escapeHtml(state.projet) + '</dd></div>';
+      metaHtml += '<div class="bilan-meta-card"><dt>Date</dt><dd>' + escapeHtml(state.date) + '</dd></div>';
+      metaHtml += '<div class="bilan-meta-card"><dt>Referentiel</dt><dd>v' + escapeHtml(state.referentiel.version) + '</dd></div>';
+      metaHtml += '<div class="bilan-meta-card"><dt>Phase evaluee</dt><dd>' + escapeHtml(phasesStr) + '</dd></div>';
+      metaHtml += '<div class="bilan-kpi-row">';
+      metaHtml += '<div class="bilan-kpi"><span class="bilan-kpi-value" style="color:#18753C">' + stats.conforme + '</span><span class="bilan-kpi-label">Conforme</span></div>';
+      metaHtml += '<div class="bilan-kpi"><span class="bilan-kpi-value" style="color:#CE0500">' + stats.nonConforme + '</span><span class="bilan-kpi-label">Non conforme</span></div>';
+      metaHtml += '<div class="bilan-kpi"><span class="bilan-kpi-value" style="color:#929292">' + stats.na + '</span><span class="bilan-kpi-label">N/A</span></div>';
+      metaHtml += '</div>';
+      document.getElementById('bilan-meta').innerHTML = metaHtml;
+
+      // Content per volet
+      var content = document.getElementById('bilan-content');
+      var html = '';
+
+      var voletOrder = [];
+      state.questions.forEach(function(q) {
+        if (voletOrder.indexOf(q.volet) === -1) voletOrder.push(q.volet);
+      });
+
+      voletOrder.forEach(function(volet) {
+        var vs = stats.parVolet[volet];
+        if (!vs) return;
+        var vTotal = vs.conforme + vs.nonConforme;
+        var vPct = vTotal > 0 ? Math.round((vs.conforme / vTotal) * 100) : 0;
+        var vAll = vTotal + vs.na;
+
+        html += '<div class="bilan-volet">';
+        html += '<div class="bilan-volet-header">';
+        html += '<h3 class="fr-h5 fr-mb-0"><span class="volet-badge ' + getVoletClass(volet) + '">' + escapeHtml(volet) + '</span></h3>';
+        html += '<span class="bilan-volet-pct" style="color:' + (vPct >= 75 ? '#18753C' : vPct >= 50 ? '#B34000' : '#CE0500') + '">';
+        html += vTotal > 0 ? vPct + '% conforme' : 'Non evalue';
+        html += '</span></div>';
+
+        if (vAll > 0) {
+          html += '<div class="bilan-bar" role="img" aria-label="' + vs.conforme + ' conforme, ' + vs.nonConforme + ' non conforme, ' + vs.na + ' non applicable">';
+          if (vs.conforme > 0) html += '<div class="bilan-bar-conforme" style="width:' + ((vs.conforme / vAll) * 100).toFixed(1) + '%"></div>';
+          if (vs.nonConforme > 0) html += '<div class="bilan-bar-non-conforme" style="width:' + ((vs.nonConforme / vAll) * 100).toFixed(1) + '%"></div>';
+          if (vs.na > 0) html += '<div class="bilan-bar-na" style="width:' + ((vs.na / vAll) * 100).toFixed(1) + '%"></div>';
+          html += '</div>';
+          html += '<div class="bilan-legend">';
+          html += '<span class="leg-c">Conforme (' + vs.conforme + ')</span>';
+          html += '<span class="leg-nc">Non conforme (' + vs.nonConforme + ')</span>';
+          html += '<span class="leg-na">N/A (' + vs.na + ')</span>';
+          html += '</div>';
+        }
+
+        // Table
+        html += '<table class="bilan-table">';
+        html += '<caption class="sr-only">Resultats du volet ' + escapeHtml(volet) + '</caption>';
+        html += '<thead><tr><th scope="col">Question</th><th scope="col">Statut</th><th scope="col">Criticite</th></tr></thead><tbody>';
+
+        state.questions.filter(function(q) { return q.volet === volet; }).forEach(function(q) {
+          var status = getQuestionStatus(q.id);
+          var statusLabel, statusColor;
+          switch (status) {
+            case 'conforme': statusLabel = 'Conforme'; statusColor = '#18753C'; break;
+            case 'non_conforme': statusLabel = 'Non conforme'; statusColor = '#CE0500'; break;
+            case 'na': statusLabel = 'Non applicable'; statusColor = '#929292'; break;
+            default: statusLabel = 'Non repondu'; statusColor = '#929292'; break;
+          }
+
+          html += '<tr>';
+          html += '<td>' + escapeHtml(q.question) + '</td>';
+          html += '<td><span class="bilan-status"><span class="bilan-status-dot" style="background:' + statusColor + '"></span>' + statusLabel + '</span></td>';
+          html += '<td><span class="criticite-badge criticite-' + q.criticite + '">' + getCriticiteLabel(q.criticite) + '</span></td>';
+          html += '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+      });
+
+      content.innerHTML = html;
+
+      // Action plan
+      var actions = document.getElementById('bilan-actions');
+      var nonConformes = state.questions.filter(function(q) {
+        return getQuestionStatus(q.id) === 'non_conforme';
+      });
+
+      var critOrder = { bloquant: 0, important: 1, recommande: 2, facultatif: 3 };
+      nonConformes.sort(function(a, b) { return (critOrder[a.criticite] || 99) - (critOrder[b.criticite] || 99); });
+
+      if (nonConformes.length === 0) {
+        actions.innerHTML = '<div class="fr-alert fr-alert--success" role="status"><p class="fr-alert__title">Aucune action corrective requise</p><p>Toutes les questions evaluees sont conformes.</p></div>';
+      } else {
+        var actHtml = '<p class="fr-text--sm fr-mb-2w" style="color:#666">' + nonConformes.length + ' action(s) corrective(s) classee(s) par criticite decroissante.</p>';
+        nonConformes.forEach(function(q, i) {
+          var r = state.reponses[q.id];
+          var customTexte = getResponseTexte(r);
+          actHtml += '<div class="action-item action-' + q.criticite + '">';
+          actHtml += '<p class="fr-text--bold fr-mb-1v" style="display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem">';
+          actHtml += '<span class="action-number">' + (i + 1) + '</span>';
+          actHtml += '<span class="criticite-badge criticite-' + q.criticite + '">' + getCriticiteLabel(q.criticite) + '</span> ';
+          actHtml += '<span>' + escapeHtml(q.question) + '</span></p>';
+          if (customTexte) actHtml += '<p class="fr-text--sm fr-mb-1v" style="font-style:italic;color:#666">Precision : ' + escapeHtml(customTexte) + '</p>';
+          actHtml += renderMesuresHTML(q, true);
+          actHtml += '</div>';
+        });
+        actions.innerHTML = actHtml;
+      }
+
+      // Update plan tab count badge
+      var planTab = document.getElementById('tab-plan');
+      planTab.textContent = 'Plan d\'action' + (nonConformes.length > 0 ? ' (' + nonConformes.length + ')' : '');
+    }
+
+    // ============================================================
+    //  SAVE / LOAD
+    // ============================================================
+    function saveProgress() {
+      var data = {
+        _type: 'questionnaire-ia-session',
+        _version: state.referentiel ? state.referentiel.version : '1.0.0',
+        _savedAt: new Date().toISOString(),
+        projet: state.projet,
+        date: state.date,
+        phases: state.phases,
+        reponses: state.reponses,
+        currentIndex: state.currentIndex,
+        stopped: state.stopped,
+        stoppedAt: state.stoppedAt
+      };
+      downloadFile(JSON.stringify(data, null, 2), 'session-' + slugify(state.projet) + '.json', 'application/json');
+      showToast('Progression sauvegardée');
+    }
+
+    // ============================================================
+    //  EXPORTS
+    // ============================================================
+    function buildExportData() {
+      var stats = computeStats();
+      var totalEval = stats.conforme + stats.nonConforme;
+      return {
+        meta: {
+          type: 'questionnaire-ia-bilan',
+          projet: state.projet,
+          date: state.date,
+          phases: state.phases,
+          referentielVersion: state.referentiel ? state.referentiel.version : '',
+          exportDate: new Date().toISOString()
+        },
+        score: {
+          globalPourcent: totalEval > 0 ? Math.round((stats.conforme / totalEval) * 100) : 0,
+          conforme: stats.conforme,
+          nonConforme: stats.nonConforme,
+          nonApplicable: stats.na,
+          total: state.questions.length
+        },
+        resultats: state.questions.map(function(q) {
+          var status = getQuestionStatus(q.id);
+          var r = state.reponses[q.id];
+          var reponseStr = (r && typeof r === 'object' && r.value === 'je_ne_sais_pas') ? ('Je ne sais pas' + (r.texte ? ': ' + r.texte : '')) : (r || '');
+          return {
+            id: q.id,
+            volet: q.volet,
+            etape: q.etape,
+            question: q.question,
+            reponse: reponseStr,
+            statut: status,
+            criticite: q.criticite,
+            mesures_resume: status === 'non_conforme' ? q.mesures.resume : ''
+          };
+        })
+      };
+    }
+
+    // Strip <b> tags and other HTML for plain text output (PDF, CSV)
+    function stripHtml(str) {
+      if (!str) return '';
+      return str.replace(/<\/?b>/g, '').replace(/<[^>]*>/g, '');
+    }
+
+    // Transliterate accented chars for PDF (helvetica has no full Latin-1 support in jsPDF)
+    function pdfSafe(str) {
+      if (!str) return '';
+      var s = stripHtml(str);
+      var map = {
+        '\u00e0':'a','\u00e2':'a','\u00e4':'a','\u00e1':'a',
+        '\u00e8':'e','\u00e9':'e','\u00ea':'e','\u00eb':'e',
+        '\u00ee':'i','\u00ef':'i','\u00ec':'i','\u00ed':'i',
+        '\u00f4':'o','\u00f6':'o','\u00f2':'o','\u00f3':'o',
+        '\u00f9':'u','\u00fb':'u','\u00fc':'u','\u00fa':'u',
+        '\u00ff':'y','\u00fd':'y',
+        '\u00e7':'c','\u00f1':'n',
+        '\u00c0':'A','\u00c2':'A','\u00c4':'A','\u00c1':'A',
+        '\u00c8':'E','\u00c9':'E','\u00ca':'E','\u00cb':'E',
+        '\u00ce':'I','\u00cf':'I','\u00cc':'I','\u00cd':'I',
+        '\u00d4':'O','\u00d6':'O','\u00d2':'O','\u00d3':'O',
+        '\u00d9':'U','\u00db':'U','\u00dc':'U','\u00da':'U',
+        '\u00c7':'C','\u00d1':'N',
+        '\u0153':'oe','\u0152':'OE',
+        '\u00ab':'<<','\u00bb':'>>',
+        '\u2019':"'",'\u2018':"'",'\u201c':'"','\u201d':'"',
+        '\u2013':'-','\u2014':'--','\u2026':'...',
+        '\u2192':'->','\u2190':'<-',
+        '\u2714':'[OK]','\u2718':'[X]','\u2716':'[X]',
+        '\u25a0':'*','\u2022':'*','\u00b7':'*'
+      };
+      return s.replace(/./g, function(c) { return map[c] || c; });
+    }
+
+    function exportPDF() {
+      if (!window.jspdf) {
+        showToast('jsPDF non charge. Essayez d\'imprimer la page (Ctrl+P).', true);
+        return;
+      }
+      var jsPDF = window.jspdf.jsPDF;
+      var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      var pw = doc.internal.pageSize.getWidth();
+      var ph = doc.internal.pageSize.getHeight();
+      var m = 18;
+      var mw = pw - 2 * m;
+      var y = 0;
+      var pageNum = 0;
+      var blue = [0, 0, 145];
+      var green = [24, 117, 60];
+      var red = [206, 5, 0];
+      var grey = [100, 100, 100];
+
+      function newPage() {
+        if (pageNum > 0) addFooter();
+        doc.addPage();
+        pageNum++;
+        y = 22;
+      }
+
+      function addFooter() {
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(150, 150, 150);
+        doc.text('Questionnaire de conformite IA -- DGFIP -- Page ' + pageNum, m, ph - 8);
+        doc.text(pdfSafe('Genere le ' + new Date().toLocaleString('fr-FR')), pw - m, ph - 8, { align: 'right' });
+        doc.setTextColor(0, 0, 0);
+      }
+
+      function checkPage(needed) {
+        if (y + needed > ph - 18) {
+          newPage();
+        }
+      }
+
+      function sectionTitle(text) {
+        checkPage(16);
+        y += 4;
+        doc.setDrawColor(0, 0, 145);
+        doc.setLineWidth(0.6);
+        doc.line(m, y, pw - m, y);
+        y += 7;
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(blue[0], blue[1], blue[2]);
+        doc.text(pdfSafe(text), m, y);
+        doc.setTextColor(0, 0, 0);
+        y += 8;
+      }
+
+      function textBlock(text, x, maxW, size, style, color) {
+        doc.setFontSize(size || 9);
+        doc.setFont('helvetica', style || 'normal');
+        if (color) doc.setTextColor(color[0], color[1], color[2]);
+        var lines = doc.splitTextToSize(pdfSafe(text), maxW || mw);
+        lines.forEach(function(l) {
+          checkPage(4.5);
+          doc.text(l, x || m, y);
+          y += size > 9 ? 5.5 : 4;
+        });
+        if (color) doc.setTextColor(0, 0, 0);
+        return lines.length;
+      }
+
+      // ---- PAGE 1: COVER ----
+      newPage();
+
+      // Blue header bar
+      doc.setFillColor(blue[0], blue[1], blue[2]);
+      doc.rect(0, 0, pw, 50, 'F');
+      doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.text('Bilan de conformite IA', m, 25);
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Direction Generale des Finances Publiques', m, 35);
+      doc.setTextColor(0, 0, 0);
+      y = 62;
+
+      // Meta info box
+      var stats = computeStats();
+      var totalEval = stats.conforme + stats.nonConforme;
+      var pct = totalEval > 0 ? Math.round((stats.conforme / totalEval) * 100) : 0;
+      var phasesStr = state.phases.map(function(p) {
+        return state.config && state.config.interface && state.config.interface.phases
+          ? (state.config.interface.phases[p] || p) : p;
+      }).join(', ');
+
+      doc.setFillColor(245, 245, 254);
+      doc.roundedRect(m, y - 4, mw, 34, 3, 3, 'F');
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      var metaItems = [
+        ['Projet', state.projet],
+        ['Date', state.date],
+        ['Referentiel', 'v' + (state.referentiel ? state.referentiel.version : '')],
+        ['Phase evaluee', phasesStr]
+      ];
+      metaItems.forEach(function(item) {
+        doc.setFont('helvetica', 'bold');
+        doc.text(pdfSafe(item[0]) + ' : ', m + 4, y);
+        var labelW = doc.getTextWidth(pdfSafe(item[0]) + ' : ');
+        doc.setFont('helvetica', 'normal');
+        doc.text(pdfSafe(item[1]), m + 4 + labelW, y);
+        y += 6;
+      });
+      y += 10;
+
+      // Score section
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      var scoreColor = pct >= 75 ? green : pct >= 50 ? [179, 64, 0] : red;
+      doc.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2]);
+      doc.text('Score global : ' + pct + '%', m, y);
+      doc.setTextColor(0, 0, 0);
+      y += 8;
+
+      // KPI boxes
+      var kpiW = (mw - 8) / 3;
+      var kpis = [
+        { label: 'Conforme', val: stats.conforme, color: green },
+        { label: 'Non conforme', val: stats.nonConforme, color: red },
+        { label: 'N/A', val: stats.na, color: [146, 146, 146] }
+      ];
+      kpis.forEach(function(kpi, i) {
+        var kx = m + i * (kpiW + 4);
+        doc.setFillColor(250, 250, 250);
+        doc.setDrawColor(220, 220, 220);
+        doc.roundedRect(kx, y - 4, kpiW, 16, 2, 2, 'FD');
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(kpi.color[0], kpi.color[1], kpi.color[2]);
+        doc.text(String(kpi.val), kx + kpiW / 2, y + 2, { align: 'center' });
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text(kpi.label, kx + kpiW / 2, y + 8, { align: 'center' });
+      });
+      doc.setTextColor(0, 0, 0);
+      y += 22;
+
+      // Synthese par volet
+      sectionTitle('Synthese par volet');
+      var voletOrder = [];
+      state.questions.forEach(function(q) {
+        if (voletOrder.indexOf(q.volet) === -1) voletOrder.push(q.volet);
+      });
+
+      voletOrder.forEach(function(volet) {
+        checkPage(14);
+        var vs = stats.parVolet[volet];
+        if (!vs) return;
+        var vTotal = vs.conforme + vs.nonConforme;
+        var vPct = vTotal > 0 ? Math.round((vs.conforme / vTotal) * 100) : 0;
+
+        // Volet name + bar
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text(pdfSafe(volet), m, y);
+        var pctText = vTotal > 0 ? vPct + '%' : 'N/A';
+        doc.text(pctText, pw - m, y, { align: 'right' });
+        y += 4;
+
+        // Mini progress bar
+        var barY = y;
+        var barH = 3;
+        var barW = mw;
+        var vAll = vTotal + vs.na;
+        doc.setFillColor(230, 230, 230);
+        doc.roundedRect(m, barY, barW, barH, 1.5, 1.5, 'F');
+        if (vAll > 0) {
+          var cW = (vs.conforme / vAll) * barW;
+          var ncW = (vs.nonConforme / vAll) * barW;
+          if (cW > 0) { doc.setFillColor(green[0], green[1], green[2]); doc.roundedRect(m, barY, cW, barH, 1.5, 1.5, 'F'); }
+          if (ncW > 0) { doc.setFillColor(red[0], red[1], red[2]); doc.rect(m + cW, barY, ncW, barH, 'F'); }
+        }
+        y += 5;
+
+        // Stats line
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(grey[0], grey[1], grey[2]);
+        doc.text(vs.conforme + ' conforme  |  ' + vs.nonConforme + ' non conforme  |  ' + vs.na + ' N/A', m, y);
+        doc.setTextColor(0, 0, 0);
+        y += 6;
+      });
+
+      // ---- PAGE 2+: DETAIL PAR QUESTION ----
+      sectionTitle('Detail par question');
+
+      state.questions.forEach(function(q) {
+        checkPage(18);
+        var status = getQuestionStatus(q.id);
+        var statusLabel, sColor;
+        switch (status) {
+          case 'conforme': statusLabel = '[OK] Conforme'; sColor = green; break;
+          case 'non_conforme': statusLabel = '[X] Non conforme'; sColor = red; break;
+          case 'na': statusLabel = '[-] Non applicable'; sColor = [146,146,146]; break;
+          default: statusLabel = '[?] Non repondu'; sColor = [146,146,146]; break;
+        }
+
+        // Question row with background
+        var qLines = doc.splitTextToSize(pdfSafe(q.question), mw - 6);
+        var blockH = qLines.length * 4 + 8;
+        checkPage(blockH + 4);
+        doc.setFillColor(status === 'non_conforme' ? 254 : 250, status === 'non_conforme' ? 240 : 250, status === 'non_conforme' ? 239 : 250);
+        doc.roundedRect(m, y - 3, mw, blockH, 2, 2, 'F');
+
+        // Status dot
+        doc.setFillColor(sColor[0], sColor[1], sColor[2]);
+        doc.circle(m + 3, y + 1, 1.5, 'F');
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text(qLines, m + 7, y);
+        y += qLines.length * 4;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(sColor[0], sColor[1], sColor[2]);
+        doc.text(statusLabel, m + 7, y);
+        var slW = doc.getTextWidth(statusLabel);
+        doc.setTextColor(grey[0], grey[1], grey[2]);
+        doc.text('  |  ' + getCriticiteLabel(q.criticite) + '  |  ' + pdfSafe(q.etape || ''), m + 7 + slW, y);
+        doc.setTextColor(0, 0, 0);
+        y += 5;
+
+        var r = state.reponses[q.id];
+        if (status === 'non_conforme' && r && typeof r === 'object' && r.value === 'je_ne_sais_pas' && r.texte) {
+          textBlock('Precision : ' + r.texte, m + 7, mw - 10, 7.5, 'italic', grey);
+          y += 1;
+        }
+        if (status === 'non_conforme' && q.mesures.resume) {
+          textBlock('-> ' + q.mesures.resume, m + 7, mw - 10, 8, 'normal', [80, 80, 80]);
+          y += 1;
+        }
+        y += 3;
+      });
+
+      // ---- PLAN D'ACTION ----
+      sectionTitle("Plan d'action");
+
+      var nonConformes = state.questions.filter(function(q) { return getQuestionStatus(q.id) === 'non_conforme'; });
+      var critOrder = { bloquant: 0, important: 1, recommande: 2, facultatif: 3 };
+      nonConformes.sort(function(a, b) { return (critOrder[a.criticite] || 99) - (critOrder[b.criticite] || 99); });
+
+      if (nonConformes.length === 0) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Aucune action corrective requise.', m, y);
+      } else {
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(grey[0], grey[1], grey[2]);
+        doc.text(nonConformes.length + ' action(s) corrective(s)', m, y);
+        doc.setTextColor(0, 0, 0);
+        y += 6;
+
+        nonConformes.forEach(function(q, idx) {
+          checkPage(22);
+
+          // Number circle
+          doc.setFillColor(blue[0], blue[1], blue[2]);
+          doc.circle(m + 3, y - 1, 3, 'F');
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(255, 255, 255);
+          doc.text(String(idx + 1), m + 3, y, { align: 'center' });
+          doc.setTextColor(0, 0, 0);
+
+          // Criticite tag
+          doc.setFontSize(7);
+          var critLabel = getCriticiteLabel(q.criticite).toUpperCase();
+          doc.text('[' + critLabel + ']', m + 8, y);
+          y += 5;
+
+          // Question
+          textBlock(q.question, m + 8, mw - 12, 9, 'bold');
+          y += 1;
+
+          // Mesures resume
+          if (q.mesures.resume) {
+            textBlock(q.mesures.resume, m + 8, mw - 12, 8, 'normal', [80, 80, 80]);
+            y += 1;
+          }
+
+          // Operatoire steps
+          if (q.mesures.operatoire && q.mesures.operatoire.length > 0) {
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Comment faire :', m + 8, y);
+            y += 4;
+            doc.setFont('helvetica', 'normal');
+            q.mesures.operatoire.forEach(function(step) {
+              var stepClean = stripLeadingNumber(step);
+              textBlock('* ' + stepClean, m + 10, mw - 14, 7.5, 'normal');
+            });
+            y += 1;
+          }
+          y += 4;
+        });
+      }
+
+      addFooter();
+      doc.save('bilan-' + slugify(state.projet) + '.pdf');
+      showToast('Export PDF telecharge');
+    }
+
+    // ============================================================
+    //  DOWNLOAD HELPER
+    // ============================================================
+    function downloadFile(content, filename, mimeType) {
+      var blob = new Blob([content], { type: mimeType });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        URL.revokeObjectURL(url);
+        if (a.parentNode) document.body.removeChild(a);
+      }, 200);
+    }
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    init();
+
+  })();
+  </script>
+</body>
+</html>
