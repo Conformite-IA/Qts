@@ -1927,32 +1927,19 @@
       return str.replace(/<\/?b>/g, '').replace(/<[^>]*>/g, '');
     }
 
-    // Transliterate accented chars for PDF (helvetica has no full Latin-1 support in jsPDF)
+    // Sanitize text for PDF — WinAnsiEncoding (Windows-1252) supports
+    // all standard French accented chars (à, é, è, ê, ë, î, ï, ô, ù, û, ç, œ, «, », etc.)
+    // Only transliterate chars genuinely outside Windows-1252.
     function pdfSafe(str) {
       if (!str) return '';
       var s = stripHtml(str);
       var map = {
-        '\u00e0':'a','\u00e2':'a','\u00e4':'a','\u00e1':'a',
-        '\u00e8':'e','\u00e9':'e','\u00ea':'e','\u00eb':'e',
-        '\u00ee':'i','\u00ef':'i','\u00ec':'i','\u00ed':'i',
-        '\u00f4':'o','\u00f6':'o','\u00f2':'o','\u00f3':'o',
-        '\u00f9':'u','\u00fb':'u','\u00fc':'u','\u00fa':'u',
-        '\u00ff':'y','\u00fd':'y',
-        '\u00e7':'c','\u00f1':'n',
-        '\u00c0':'A','\u00c2':'A','\u00c4':'A','\u00c1':'A',
-        '\u00c8':'E','\u00c9':'E','\u00ca':'E','\u00cb':'E',
-        '\u00ce':'I','\u00cf':'I','\u00cc':'I','\u00cd':'I',
-        '\u00d4':'O','\u00d6':'O','\u00d2':'O','\u00d3':'O',
-        '\u00d9':'U','\u00db':'U','\u00dc':'U','\u00da':'U',
-        '\u00c7':'C','\u00d1':'N',
-        '\u0153':'oe','\u0152':'OE',
-        '\u00ab':'<<','\u00bb':'>>',
         '\u2019':"'",'\u2018':"'",'\u201c':'"','\u201d':'"',
         '\u2013':'-','\u2014':'--','\u2026':'...',
         '\u2192':'->','\u2190':'<-',
         '\u2714':'[OK]','\u2718':'[X]','\u2716':'[X]',
-        '\u25a0':'*','\u2022':'*','\u00b7':'*',
-        '\u00a0':' ','\u00b0':'o'
+        '\u25a0':'*','\u2022':'*',
+        '\u00a0':' '
       };
       return s.replace(/./g, function(c) { return map[c] || c; });
     }
@@ -1986,7 +1973,7 @@
         doc.setFontSize(7);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(150, 150, 150);
-        doc.text('Questionnaire de conformite IA -- DGFIP -- Page ' + pageNum, m, ph - 8);
+        doc.text(pdfSafe('Questionnaire de conformité IA — DGFIP — Page ') + pageNum, m, ph - 8);
         doc.text(pdfSafe('Généré le ' + new Date().toLocaleString('fr-FR')), pw - m, ph - 8, { align: 'right' });
         doc.setTextColor(0, 0, 0);
       }
@@ -2026,7 +2013,124 @@
         return lines.length;
       }
 
-      // ---- PAGE 1: COVER ----
+      // ---- PAGE 1: DISCLAIMER (use the page already created by new jsPDF) ----
+      pageNum = 1;
+      y = 18;
+
+      // Blue header bar
+      doc.setFillColor(blue[0], blue[1], blue[2]);
+      doc.rect(0, 0, pw, 42, 'F');
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.text(pdfSafe('Bilan de conformité IA'), m, 22);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(pdfSafe('Direction Générale des Finances Publiques'), m, 32);
+      doc.setTextColor(0, 0, 0);
+      y = 52;
+
+      // --- Disclaimer: Avertissement ---
+      doc.setFillColor(245, 245, 254);
+      doc.setDrawColor(0, 0, 145);
+      doc.setLineWidth(0.8);
+      var disclaimerBoxY = y;
+      var disclaimerText1 = pdfSafe('Ce questionnaire d\'auto-évaluation sur l\'intelligence artificielle est fourni à titre informatif et pédagogique uniquement. Il ne constitue en aucun cas un audit de conformité, un avis juridique ou une consultation réglementaire.');
+      var disclaimerText2 = pdfSafe('Les résultats générés reposent sur les réponses déclaratives de l\'utilisateur et ne sauraient se substituer à une analyse approfondie menée par un professionnel qualifié (délégué à la protection des données, juriste spécialisé, expert en IA).');
+      var disclaimerText3 = pdfSafe('L\'organisme éditeur décline toute responsabilité quant aux décisions prises sur la base des résultats de ce questionnaire ou aux conséquences directes et indirectes de leur utilisation.');
+      var dLines1 = doc.splitTextToSize(disclaimerText1, mw - 12);
+      var dLines2 = doc.splitTextToSize(disclaimerText2, mw - 12);
+      var dLines3 = doc.splitTextToSize(disclaimerText3, mw - 12);
+      var disclaimerH = (dLines1.length + dLines2.length + dLines3.length) * 4 + 18;
+      doc.roundedRect(m, disclaimerBoxY, mw, disclaimerH, 2, 2, 'FD');
+      y = disclaimerBoxY + 6;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(blue[0], blue[1], blue[2]);
+      doc.text(pdfSafe('Avertissement — Limites de responsabilité'), m + 6, y);
+      doc.setTextColor(0, 0, 0);
+      y += 6;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      dLines1.forEach(function(l) { doc.text(l, m + 6, y); y += 4; });
+      y += 1;
+      dLines2.forEach(function(l) { doc.text(l, m + 6, y); y += 4; });
+      y += 1;
+      dLines3.forEach(function(l) { doc.text(l, m + 6, y); y += 4; });
+      y += 6;
+
+      // --- Disclaimer: Cadre réglementaire ---
+      var noticeY = y;
+      var noticeText = pdfSafe('Les questions s\'appuient sur l\'état du droit applicable à la date d\'édition du document. Le règlement européen sur l\'IA (AI Act) et ses actes délégués étant susceptibles d\'évoluer, les informations présentées peuvent devenir partiellement obsolètes.');
+      var nLines = doc.splitTextToSize(noticeText, mw - 12);
+      var noticeH = nLines.length * 4 + 14;
+      doc.setFillColor(254, 231, 219);
+      doc.setDrawColor(179, 64, 0);
+      doc.setLineWidth(0.8);
+      doc.roundedRect(m, noticeY, mw, noticeH, 2, 2, 'FD');
+      y = noticeY + 6;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(179, 64, 0);
+      doc.text(pdfSafe('Cadre réglementaire en évolution'), m + 6, y);
+      doc.setTextColor(0, 0, 0);
+      y += 6;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      nLines.forEach(function(l) { doc.text(l, m + 6, y); y += 4; });
+      y += 6;
+
+      // --- Disclaimer: conditions d'utilisation ---
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(m, y, pw - m, y);
+      y += 6;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text(pdfSafe('En utilisant ce questionnaire, vous reconnaissez que :'), m, y);
+      y += 5;
+      doc.setFont('helvetica', 'normal');
+      var conditions = [
+        pdfSafe('Les résultats ont une valeur indicative et non contraignante'),
+        pdfSafe('Ils ne créent aucune obligation juridique pour l\'organisme éditeur'),
+        pdfSafe('Vous êtes seul responsable de l\'interprétation et de l\'usage des résultats'),
+        pdfSafe('Une consultation spécialisée reste indispensable pour toute mise en conformité')
+      ];
+      conditions.forEach(function(c) {
+        doc.text('—  ' + c, m + 4, y);
+        y += 4.5;
+      });
+      y += 4;
+
+      // --- Disclaimer: badges ---
+      doc.setFontSize(7);
+      var badges = ['Document non contractuel', 'Ne vaut pas avis juridique', pdfSafe('Auto-évaluation déclarative')];
+      var badgeColors = [[232,237,255,0,0,145], [254,231,219,179,64,0], [195,250,213,24,117,60]];
+      var bx = m;
+      badges.forEach(function(badge, i) {
+        var bc = badgeColors[i];
+        var tw = doc.getTextWidth(badge) + 8;
+        doc.setFillColor(bc[0], bc[1], bc[2]);
+        doc.roundedRect(bx, y - 3, tw, 5.5, 1.5, 1.5, 'F');
+        doc.setTextColor(bc[3], bc[4], bc[5]);
+        doc.text(badge, bx + 4, y);
+        bx += tw + 4;
+      });
+      doc.setTextColor(0, 0, 0);
+      y += 8;
+
+      // --- Disclaimer: version ---
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(m, y, pw - m, y);
+      y += 5;
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(grey[0], grey[1], grey[2]);
+      doc.text(pdfSafe('Version du document : avril 2026 — Conforme au Règlement (UE) 2024/1689 (AI Act) dans sa version en vigueur à cette date.'), m, y);
+      doc.setTextColor(0, 0, 0);
+
+      // ---- PAGE 2: COVER / BILAN ----
       newPage();
 
       // Blue header bar
@@ -2035,10 +2139,10 @@
       doc.setFontSize(22);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(255, 255, 255);
-      doc.text('Bilan de conformite IA', m, 25);
+      doc.text(pdfSafe('Bilan de conformité IA'), m, 25);
       doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
-      doc.text('Direction Generale des Finances Publiques', m, 35);
+      doc.text(pdfSafe('Direction Générale des Finances Publiques'), m, 35);
       doc.setTextColor(0, 0, 0);
       y = 62;
 
@@ -2105,7 +2209,7 @@
       y += 22;
 
       // Synthese par volet
-      sectionTitle('Synthese par volet');
+      sectionTitle('Synthèse par volet');
       var voletOrder = [];
       state.questions.forEach(function(q) {
         if (voletOrder.indexOf(q.volet) === -1) voletOrder.push(q.volet);
@@ -2151,7 +2255,7 @@
       });
 
       // ---- PAGE 2+: DETAIL PAR QUESTION ----
-      sectionTitle('Detail par question');
+      sectionTitle('Détail par question');
 
       state.questions.forEach(function(q) {
         checkPage(18);
@@ -2161,7 +2265,7 @@
           case 'conforme': statusLabel = '[OK] Conforme'; sColor = green; break;
           case 'non_conforme': statusLabel = '[X] Non conforme'; sColor = red; break;
           case 'na': statusLabel = '[-] Non applicable'; sColor = [146,146,146]; break;
-          default: statusLabel = '[?] Non repondu'; sColor = [146,146,146]; break;
+          default: statusLabel = pdfSafe('[?] Non répondu'); sColor = [146,146,146]; break;
         }
 
         // Question row with background
@@ -2251,18 +2355,85 @@
 
           // Operatoire steps
           if (q.mesures.operatoire && q.mesures.operatoire.length > 0) {
+            checkPage(10);
             doc.setFontSize(8);
             doc.setFont('helvetica', 'bold');
-            doc.text('Comment faire :', m + 8, y);
+            doc.text(pdfSafe('Comment faire :'), m + 8, y);
             y += 4;
             doc.setFont('helvetica', 'normal');
             q.mesures.operatoire.forEach(function(step) {
               var stepClean = stripLeadingNumber(step);
-              textBlock('* ' + stepClean, m + 10, mw - 14, 7.5, 'normal');
+              textBlock(pdfSafe('• ' + stepClean), m + 10, mw - 14, 7.5, 'normal');
             });
             y += 1;
           }
-          y += 4;
+
+          // Detail (En savoir plus)
+          if (q.mesures.detail) {
+            checkPage(10);
+            doc.setFontSize(7.5);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(blue[0], blue[1], blue[2]);
+            doc.text(pdfSafe('En savoir plus (détail juridique) :'), m + 8, y);
+            doc.setTextColor(0, 0, 0);
+            y += 4;
+            doc.setFont('helvetica', 'normal');
+            var detailClean = pdfSafe(q.mesures.detail);
+            var detailParas = detailClean.split(/\n\n+/);
+            detailParas.forEach(function(para) {
+              var trimmed = para.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+              if (!trimmed) return;
+              textBlock(trimmed, m + 10, mw - 14, 7, 'normal', grey);
+              y += 1;
+            });
+            y += 1;
+          }
+
+          // Lien(s) de référence
+          if (q.lien && q.lien.trim()) {
+            checkPage(8);
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(blue[0], blue[1], blue[2]);
+            doc.text(pdfSafe('Référence(s) :'), m + 8, y);
+            y += 3.5;
+            doc.setFont('helvetica', 'normal');
+
+            var rawLien = q.lien.trim();
+            var labelMatch = rawLien.match(/<b>(.*?)<\/b>\s*(https?:\/\/\S+)/i);
+            if (labelMatch) {
+              var lbl = pdfSafe(labelMatch[1].replace(/\s*:\s*$/, ''));
+              var href = labelMatch[2].trim();
+              doc.setTextColor(80, 80, 80);
+              doc.text(lbl + ' :', m + 10, y);
+              y += 3.5;
+              doc.setTextColor(0, 0, 145);
+              doc.textWithLink(pdfSafe(href), m + 10, y, { url: href });
+              y += 3.5;
+            } else {
+              var urls = rawLien.split(/\s+/).filter(function(u) { return u.match(/^https?:\/\//); });
+              if (urls.length > 0) {
+                urls.forEach(function(href) {
+                  checkPage(5);
+                  doc.setTextColor(0, 0, 145);
+                  doc.textWithLink(pdfSafe(href), m + 10, y, { url: href.trim() });
+                  y += 3.5;
+                });
+              } else {
+                doc.setTextColor(80, 80, 80);
+                textBlock(pdfSafe(rawLien.replace(/<[^>]+>/g, '')), m + 10, mw - 14, 7, 'normal');
+              }
+            }
+            doc.setTextColor(0, 0, 0);
+            y += 1;
+          }
+
+          // Separator
+          checkPage(6);
+          doc.setDrawColor(220, 220, 220);
+          doc.setLineWidth(0.2);
+          doc.line(m + 8, y, pw - m, y);
+          y += 5;
         });
       }
 
